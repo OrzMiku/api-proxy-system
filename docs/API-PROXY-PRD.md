@@ -32,18 +32,18 @@
 
 ### 2.1 技术栈总览
 
-| 类别 | 技术选择 | 版本 | 说明 |
-|------|---------|------|------|
-| 前后端框架 | Next.js | 15.x | React 全栈框架，支持 App Router |
-| UI 组件库 | shadcn/ui | latest | 基于 Radix UI 的组件库 |
-| CSS 框架 | Tailwind CSS | 3.x | 实用优先的 CSS 框架 |
-| ORM | Drizzle ORM | latest | 轻量级、类型安全的 ORM |
-| 数据库 | PostgreSQL/MySQL/SQLite | - | 通过 Drizzle 支持多种数据库 |
-| 缓存 | Redis | 7.x | 用于轮询状态和性能优化 |
-| Redis 客户端 | ioredis | 5.x | 功能丰富的 Redis 客户端 |
-| 认证 | NextAuth.js | 5.x | 开源认证解决方案 |
-| 运行时 | Node.js | 18.x+ | JavaScript 运行时 |
-| 包管理器 | pnpm | 8.x+ | 快速、节省磁盘空间的包管理器 |
+| 类别         | 技术选择                | 版本   | 说明                            |
+| ------------ | ----------------------- | ------ | ------------------------------- |
+| 前后端框架   | Next.js                 | 15.x   | React 全栈框架，支持 App Router |
+| UI 组件库    | shadcn/ui               | latest | 基于 Radix UI 的组件库          |
+| CSS 框架     | Tailwind CSS            | 3.x    | 实用优先的 CSS 框架             |
+| ORM          | Drizzle ORM             | latest | 轻量级、类型安全的 ORM          |
+| 数据库       | PostgreSQL/MySQL/SQLite | -      | 通过 Drizzle 支持多种数据库     |
+| 缓存         | Redis                   | 7.x    | 用于轮询状态和性能优化          |
+| Redis 客户端 | ioredis                 | 5.x    | 功能丰富的 Redis 客户端         |
+| 认证         | NextAuth.js             | 5.x    | 开源认证解决方案                |
+| 运行时       | Node.js                 | 18.x+  | JavaScript 运行时               |
+| 包管理器     | pnpm                    | 8.x+   | 快速、节省磁盘空间的包管理器    |
 
 ### 2.2 技术选型详细分析
 
@@ -51,17 +51,17 @@
 
 **对比分析**
 
-| 特性 | Drizzle ORM | Prisma | TypeORM |
-|------|-------------|--------|---------|
-| 性能 | ⭐⭐⭐⭐⭐ 最快 | ⭐⭐⭐ 中等 | ⭐⭐⭐ 中等 |
-| Bundle 大小 | ⭐⭐⭐⭐⭐ 最小 | ⭐⭐ 较大 | ⭐⭐⭐ 中等 |
-| Serverless 支持 | ⭐⭐⭐⭐⭐ 优秀 | ⭐⭐ 需要额外配置 | ⭐⭐⭐ 一般 |
-| 类型安全 | ⭐⭐⭐⭐⭐ 完全类型安全 | ⭐⭐⭐⭐⭐ 完全类型安全 | ⭐⭐⭐⭐ 良好 |
-| SQL 控制 | ⭐⭐⭐⭐⭐ 接近原生 SQL | ⭐⭐⭐ 抽象层较高 | ⭐⭐⭐⭐ 灵活 |
-| 学习曲线 | ⭐⭐⭐⭐ 熟悉 SQL 即可 | ⭐⭐⭐ 需要学习 DSL | ⭐⭐⭐ 中等 |
-| 迁移工具 | ⭐⭐⭐⭐ 优秀 | ⭐⭐⭐⭐⭐ 卓越 | ⭐⭐⭐ 一般 |
-| 数据库支持 | PostgreSQL, MySQL, SQLite | PostgreSQL, MySQL, SQLite, SQL Server, MongoDB, CockroachDB | 支持更多数据库 |
-| 社区活跃度 | ⭐⭐⭐⭐ 快速增长 | ⭐⭐⭐⭐⭐ 非常活跃 | ⭐⭐⭐⭐ 成熟稳定 |
+| 特性            | Drizzle ORM               | Prisma                                                      | TypeORM           |
+| --------------- | ------------------------- | ----------------------------------------------------------- | ----------------- |
+| 性能            | ⭐⭐⭐⭐⭐ 最快           | ⭐⭐⭐ 中等                                                 | ⭐⭐⭐ 中等       |
+| Bundle 大小     | ⭐⭐⭐⭐⭐ 最小           | ⭐⭐ 较大                                                   | ⭐⭐⭐ 中等       |
+| Serverless 支持 | ⭐⭐⭐⭐⭐ 优秀           | ⭐⭐ 需要额外配置                                           | ⭐⭐⭐ 一般       |
+| 类型安全        | ⭐⭐⭐⭐⭐ 完全类型安全   | ⭐⭐⭐⭐⭐ 完全类型安全                                     | ⭐⭐⭐⭐ 良好     |
+| SQL 控制        | ⭐⭐⭐⭐⭐ 接近原生 SQL   | ⭐⭐⭐ 抽象层较高                                           | ⭐⭐⭐⭐ 灵活     |
+| 学习曲线        | ⭐⭐⭐⭐ 熟悉 SQL 即可    | ⭐⭐⭐ 需要学习 DSL                                         | ⭐⭐⭐ 中等       |
+| 迁移工具        | ⭐⭐⭐⭐ 优秀             | ⭐⭐⭐⭐⭐ 卓越                                             | ⭐⭐⭐ 一般       |
+| 数据库支持      | PostgreSQL, MySQL, SQLite | PostgreSQL, MySQL, SQLite, SQL Server, MongoDB, CockroachDB | 支持更多数据库    |
+| 社区活跃度      | ⭐⭐⭐⭐ 快速增长         | ⭐⭐⭐⭐⭐ 非常活跃                                         | ⭐⭐⭐⭐ 成熟稳定 |
 
 **选择理由**
 
@@ -78,17 +78,17 @@
 
 **对比分析**
 
-| 特性 | ioredis | node-redis |
-|------|---------|-----------|
-| 性能 | ⭐⭐⭐⭐⭐ 优秀 | ⭐⭐⭐⭐ 良好 |
-| Cluster 支持 | ⭐⭐⭐⭐⭐ 内置完整支持 | ⭐⭐⭐⭐ 支持 |
-| Sentinel 支持 | ⭐⭐⭐⭐⭐ 内置支持 | ⭐⭐⭐⭐ 支持 |
-| Pipeline 优化 | ⭐⭐⭐⭐⭐ 自动 Pipeline | ⭐⭐⭐ 手动 |
-| 周下载量 | 7,958,289 | 5,513,391 |
-| GitHub Stars | 14,987 | 17,308 |
-| 维护状态 | ⭐⭐⭐⭐⭐ 活跃 | ⭐⭐⭐⭐⭐ 活跃 |
-| Redis 8 支持 | ⭐⭐⭐⭐ 良好 | ⭐⭐⭐⭐⭐ 优先支持 |
-| API 成熟度 | ⭐⭐⭐⭐⭐ 非常成熟 | ⭐⭐⭐⭐ 现代化 |
+| 特性          | ioredis                  | node-redis          |
+| ------------- | ------------------------ | ------------------- |
+| 性能          | ⭐⭐⭐⭐⭐ 优秀          | ⭐⭐⭐⭐ 良好       |
+| Cluster 支持  | ⭐⭐⭐⭐⭐ 内置完整支持  | ⭐⭐⭐⭐ 支持       |
+| Sentinel 支持 | ⭐⭐⭐⭐⭐ 内置支持      | ⭐⭐⭐⭐ 支持       |
+| Pipeline 优化 | ⭐⭐⭐⭐⭐ 自动 Pipeline | ⭐⭐⭐ 手动         |
+| 周下载量      | 7,958,289                | 5,513,391           |
+| GitHub Stars  | 14,987                   | 17,308              |
+| 维护状态      | ⭐⭐⭐⭐⭐ 活跃          | ⭐⭐⭐⭐⭐ 活跃     |
+| Redis 8 支持  | ⭐⭐⭐⭐ 良好            | ⭐⭐⭐⭐⭐ 优先支持 |
+| API 成熟度    | ⭐⭐⭐⭐⭐ 非常成熟      | ⭐⭐⭐⭐ 现代化     |
 
 **选择理由**
 
@@ -104,17 +104,17 @@
 
 **对比分析**
 
-| 特性 | NextAuth.js v5 | Clerk | Lucia Auth |
-|------|---------------|-------|-----------|
-| 成本 | ⭐⭐⭐⭐⭐ 免费开源 | ⭐⭐ 付费 SaaS | ⭐⭐⭐⭐⭐ 免费开源 (已废弃) |
-| 灵活性 | ⭐⭐⭐⭐⭐ 完全可定制 | ⭐⭐⭐ 受限于平台 | ⭐⭐⭐⭐⭐ 完全可定制 |
-| 设置时间 | ⭐⭐⭐ 1-2 小时 | ⭐⭐⭐⭐⭐ 30 分钟 | ⭐⭐⭐ 需要较多配置 |
-| DX (开发体验) | ⭐⭐⭐⭐ 良好 | ⭐⭐⭐⭐⭐ 优秀 | ⭐⭐⭐ 一般 |
-| App Router 支持 | ⭐⭐⭐⭐⭐ 完整支持 | ⭐⭐⭐⭐⭐ 完整支持 | ⭐⭐⭐ 一般 |
-| 数据所有权 | ⭐⭐⭐⭐⭐ 完全控制 | ⭐⭐ 托管在 Clerk | ⭐⭐⭐⭐⭐ 完全控制 |
-| Provider 支持 | ⭐⭐⭐⭐⭐ 80+ | ⭐⭐⭐⭐ 20+ | ⭐⭐⭐ 需自行实现 |
-| 供应商锁定 | ⭐⭐⭐⭐⭐ 无 | ⭐⭐ 强锁定 | ⭐⭐⭐⭐⭐ 无 |
-| 社区支持 | ⭐⭐⭐⭐⭐ 非常活跃 | ⭐⭐⭐⭐ 活跃 | ⭐ 已停止维护 |
+| 特性            | NextAuth.js v5        | Clerk               | Lucia Auth                   |
+| --------------- | --------------------- | ------------------- | ---------------------------- |
+| 成本            | ⭐⭐⭐⭐⭐ 免费开源   | ⭐⭐ 付费 SaaS      | ⭐⭐⭐⭐⭐ 免费开源 (已废弃) |
+| 灵活性          | ⭐⭐⭐⭐⭐ 完全可定制 | ⭐⭐⭐ 受限于平台   | ⭐⭐⭐⭐⭐ 完全可定制        |
+| 设置时间        | ⭐⭐⭐ 1-2 小时       | ⭐⭐⭐⭐⭐ 30 分钟  | ⭐⭐⭐ 需要较多配置          |
+| DX (开发体验)   | ⭐⭐⭐⭐ 良好         | ⭐⭐⭐⭐⭐ 优秀     | ⭐⭐⭐ 一般                  |
+| App Router 支持 | ⭐⭐⭐⭐⭐ 完整支持   | ⭐⭐⭐⭐⭐ 完整支持 | ⭐⭐⭐ 一般                  |
+| 数据所有权      | ⭐⭐⭐⭐⭐ 完全控制   | ⭐⭐ 托管在 Clerk   | ⭐⭐⭐⭐⭐ 完全控制          |
+| Provider 支持   | ⭐⭐⭐⭐⭐ 80+        | ⭐⭐⭐⭐ 20+        | ⭐⭐⭐ 需自行实现            |
+| 供应商锁定      | ⭐⭐⭐⭐⭐ 无         | ⭐⭐ 强锁定         | ⭐⭐⭐⭐⭐ 无                |
+| 社区支持        | ⭐⭐⭐⭐⭐ 非常活跃   | ⭐⭐⭐⭐ 活跃       | ⭐ 已停止维护                |
 
 **重要说明**: Lucia Auth 已于 2025年3月宣布停止维护，不再适用于生产环境。
 
@@ -253,8 +253,12 @@ import { pgTable, serial, integer, timestamp } from 'drizzle-orm/pg-core'
 
 export const groupProviders = pgTable('group_providers', {
   id: serial('id').primaryKey(),
-  groupId: integer('group_id').notNull().references(() => groups.id, { onDelete: 'cascade' }),
-  providerId: integer('provider_id').notNull().references(() => providers.id, { onDelete: 'cascade' }),
+  groupId: integer('group_id')
+    .notNull()
+    .references(() => groups.id, { onDelete: 'cascade' }),
+  providerId: integer('provider_id')
+    .notNull()
+    .references(() => providers.id, { onDelete: 'cascade' }),
   priority: integer('priority').notNull().default(0), // 优先级，用于权重计算
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
@@ -399,8 +403,7 @@ async function selectEndpoint(groupId: string): Promise<Provider> {
       const baseWeight = ep.priority || 50
 
       // 健康状态加成
-      const healthBonus = health.status === 'healthy' ? 20 :
-                          health.status === 'degraded' ? 10 : 0
+      const healthBonus = health.status === 'healthy' ? 20 : health.status === 'degraded' ? 10 : 0
 
       // 成功率加成 (0-20)
       const successBonus = (health.successRate / 100) * 20
@@ -449,7 +452,7 @@ async function updateEndpointHealth(
   error?: Error
 ) {
   const key = `endpoint:health:${providerId}`
-  const health = await redis.hgetall(key) || {}
+  const health = (await redis.hgetall(key)) || {}
 
   const now = Date.now()
   const failureCount = parseInt(health.failureCount || '0')
@@ -460,8 +463,8 @@ async function updateEndpointHealth(
     // 成功请求：降低失败计数，更新成功率和响应时间
     const newFailureCount = Math.max(failureCount - 1, 0)
     const newSuccessRate = Math.min(successRate + 2, 100) // 逐步恢复
-    const newAvgResponseTime = avgResponseTime === 0 ? responseTime :
-                               (avgResponseTime * 0.9 + responseTime * 0.1) // 指数移动平均
+    const newAvgResponseTime =
+      avgResponseTime === 0 ? responseTime : avgResponseTime * 0.9 + responseTime * 0.1 // 指数移动平均
 
     await redis.hset(key, {
       status: newFailureCount === 0 ? 'healthy' : 'degraded',
@@ -503,7 +506,8 @@ async function updateEndpointHealth(
 async function activeHealthCheck(providerId: string, apiUrl: string) {
   try {
     const start = Date.now()
-    const response = await fetch(`${apiUrl}/health`, { // 假设端点有健康检查接口
+    const response = await fetch(`${apiUrl}/health`, {
+      // 假设端点有健康检查接口
       method: 'GET',
       signal: AbortSignal.timeout(5000), // 5秒超时
     })
@@ -551,7 +555,7 @@ async function proxyRequest(
         method: requestData.method,
         headers: {
           ...requestData.headers,
-          'Authorization': `Bearer ${endpoint.apiKey}`, // 使用提供商的 API Key
+          Authorization: `Bearer ${endpoint.apiKey}`, // 使用提供商的 API Key
           'Content-Type': 'application/json',
         },
         body: requestData.body ? JSON.stringify(requestData.body) : undefined,
@@ -580,7 +584,6 @@ async function proxyRequest(
 
       // 返回响应
       return response
-
     } catch (error) {
       lastError = error as Error
 
@@ -611,7 +614,9 @@ async function proxyRequest(
       }
 
       // 等待一段时间后重试（指数退避）
-      await new Promise(resolve => setTimeout(resolve, Math.min(100 * Math.pow(2, attemptCount), 2000)))
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.min(100 * Math.pow(2, attemptCount), 2000))
+      )
     }
   }
 
@@ -652,9 +657,7 @@ async function validateApiKey(
   }
 
   // 更新最后使用时间
-  await db.update(apiKeys)
-    .set({ lastUsedAt: new Date() })
-    .where(eq(apiKeys.id, apiKey.id))
+  await db.update(apiKeys).set({ lastUsedAt: new Date() }).where(eq(apiKeys.id, apiKey.id))
 
   // 如果是全局 Key，可以访问所有分组
   if (apiKey.isGlobal) {
@@ -727,10 +730,7 @@ export async function middleware(request: NextRequest) {
     const validation = await validateApiKey(apiKey)
 
     if (!validation.valid) {
-      return NextResponse.json(
-        { error: 'Invalid API key' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Invalid API key' }, { status: 401 })
     }
 
     if (validation.apiKeyId) {
@@ -956,10 +956,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { proxyRequest } from '@/lib/proxy'
 import { validateApiKey } from '@/lib/auth'
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: { group: string } }
-) {
+export async function POST(request: NextRequest, { params }: { params: { group: string } }) {
   try {
     // 1. 验证 API Key
     const apiKey = request.headers.get('x-api-key')
@@ -973,7 +970,7 @@ export async function POST(
     }
 
     // 2. 获取分组 ID
-    const groupId = validation.groupId || await getGroupIdByName(params.group)
+    const groupId = validation.groupId || (await getGroupIdByName(params.group))
 
     if (!groupId) {
       return NextResponse.json(
@@ -1002,7 +999,6 @@ export async function POST(
         'X-RateLimit-Remaining': request.headers.get('x-ratelimit-remaining') || '0',
       },
     })
-
   } catch (error) {
     console.error('Proxy error:', error)
 
@@ -1256,7 +1252,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       - DATABASE_URL=postgresql://postgres:password@db:5432/api_proxy
       - REDIS_URL=redis://redis:6379
@@ -1276,7 +1272,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
     restart: unless-stopped
 
   redis:
@@ -1285,14 +1281,14 @@ services:
     volumes:
       - redis_data:/data
     ports:
-      - "6379:6379"
+      - '6379:6379'
     restart: unless-stopped
 
   nginx:
     image: nginx:alpine
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
@@ -1498,7 +1494,7 @@ pnpm drizzle-kit studio
 
 3. **查询优化**
    - 避免 N+1 查询
-   - 使用 SELECT 指定字段，避免 SELECT *
+   - 使用 SELECT 指定字段，避免 SELECT \*
    - 对大数据量查询使用分页
 
 ### 8.3 Redis 优化
@@ -1791,7 +1787,7 @@ redis.hset('endpoint:health:123', {
   lastCheck: Date.now(),
   lastSuccess: Date.now(),
   avgResponseTime: 150,
-  successRate: 98.5
+  successRate: 98.5,
 })
 
 // 2. 轮询权重缓存
@@ -1813,7 +1809,7 @@ redis.set(
   'group:endpoints:1',
   JSON.stringify([
     { id: 123, name: 'Provider A', url: 'https://api-a.com', priority: 10 },
-    { id: 456, name: 'Provider B', url: 'https://api-b.com', priority: 5 }
+    { id: 456, name: 'Provider B', url: 'https://api-b.com', priority: 5 },
   ]),
   'EX',
   300
@@ -1831,13 +1827,7 @@ redis.expire(`stats:provider:123:${today}`, 604800) // 7天
 // Key Pattern: lock:endpoint:{providerId}
 // Type: String
 const lockId = crypto.randomUUID()
-const acquired = await redis.set(
-  'lock:endpoint:123',
-  lockId,
-  'NX',
-  'EX',
-  10
-)
+const acquired = await redis.set('lock:endpoint:123', lockId, 'NX', 'EX', 10)
 ```
 
 ---

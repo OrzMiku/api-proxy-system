@@ -159,7 +159,7 @@ interface HasId {
 }
 
 function findById<T extends HasId>(items: T[], id: number): T | undefined {
-  return items.find(item => item.id === id)
+  return items.find((item) => item.id === id)
 }
 ```
 
@@ -614,10 +614,7 @@ export async function GET(request: NextRequest) {
     // 1. 认证检查
     const session = await auth()
     if (!session) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // 2. 查询参数解析
@@ -639,10 +636,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('API Error:', error)
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
 
@@ -650,24 +644,15 @@ export async function POST(request: NextRequest) {
   try {
     const session = await auth()
     if (!session || session.user.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const body = await request.json()
     const validated = providerSchema.parse(body)
 
-    const [newProvider] = await db
-      .insert(providers)
-      .values(validated)
-      .returning()
+    const [newProvider] = await db.insert(providers).values(validated).returning()
 
-    return NextResponse.json(
-      { data: newProvider },
-      { status: 201 }
-    )
+    return NextResponse.json({ data: newProvider }, { status: 201 })
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -675,10 +660,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
 ```
@@ -695,46 +677,27 @@ interface RouteParams {
   }
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   const providerId = parseInt(params.id)
 
   if (isNaN(providerId)) {
-    return NextResponse.json(
-      { error: 'Invalid provider ID' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Invalid provider ID' }, { status: 400 })
   }
 
-  const provider = await db
-    .select()
-    .from(providers)
-    .where(eq(providers.id, providerId))
-    .limit(1)
+  const provider = await db.select().from(providers).where(eq(providers.id, providerId)).limit(1)
 
   if (!provider[0]) {
-    return NextResponse.json(
-      { error: 'Provider not found' },
-      { status: 404 }
-    )
+    return NextResponse.json({ error: 'Provider not found' }, { status: 404 })
   }
 
   return NextResponse.json({ data: provider[0] })
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function PUT(request: NextRequest, { params }: RouteParams) {
   // PUT 实现
 }
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
   // DELETE 实现
 }
 ```
@@ -776,10 +739,7 @@ export async function GET(request: NextRequest) {
 
     // 未预期的错误
     console.error('Unexpected error:', error)
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
   }
 }
 ```
@@ -799,17 +759,13 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // 检查是否是受保护的路径
-  const isProtectedPath = protectedPaths.some(path =>
-    pathname.startsWith(path)
-  )
-  const isAuthPath = authPaths.some(path =>
-    pathname.startsWith(path)
-  )
+  const isProtectedPath = protectedPaths.some((path) => pathname.startsWith(path))
+  const isAuthPath = authPaths.some((path) => pathname.startsWith(path))
 
   if (isProtectedPath) {
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET
+      secret: process.env.NEXTAUTH_SECRET,
     })
 
     if (!token) {
@@ -828,7 +784,7 @@ export async function middleware(request: NextRequest) {
   if (isAuthPath) {
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET
+      secret: process.env.NEXTAUTH_SECRET,
     })
     if (token) {
       return NextResponse.redirect(new URL('/', request.url))
@@ -1069,10 +1025,7 @@ useEffect(() => {
 }, [someObject]) // 对象每次都是新的引用
 
 // ✅ 对象依赖使用 useMemo
-const config = useMemo(
-  () => ({ url: apiUrl, key: apiKey }),
-  [apiUrl, apiKey]
-)
+const config = useMemo(() => ({ url: apiUrl, key: apiKey }), [apiUrl, apiKey])
 
 useEffect(() => {
   fetchWithConfig(config)
@@ -1097,7 +1050,7 @@ useEffect(() => {
 const [count, setCount] = useState(0)
 
 // 好：使用函数式更新避免闭包陷阱
-const increment = () => setCount(c => c + 1)
+const increment = () => setCount((c) => c + 1)
 
 // ✅ useCallback 缓存回调
 const handleSubmit = useCallback(
@@ -1108,10 +1061,7 @@ const handleSubmit = useCallback(
 )
 
 // ✅ useMemo 缓存计算结果
-const expensiveValue = useMemo(
-  () => computeExpensiveValue(a, b),
-  [a, b]
-)
+const expensiveValue = useMemo(() => computeExpensiveValue(a, b), [a, b])
 
 // ❌ 避免过度优化
 // 简单的计算不需要 useMemo
@@ -1173,7 +1123,241 @@ export function cn(...inputs: ClassValue[]) {
 </div>
 ```
 
-### 4.4 表单处理
+### 4.4 shadcn/ui 组件库使用
+
+本项目使用 shadcn/ui 作为 UI 组件库。**重要提示**：shadcn/ui 不是传统的 npm 包，而是通过 CLI 将组件代码直接复制到项目中。
+
+#### 4.4.1 什么是 shadcn/ui
+
+```typescript
+// ❌ 错误理解：shadcn/ui 不是 npm 包
+import { Button } from 'shadcn/ui' // 这样导入是错误的
+
+// ✅ 正确理解：组件代码在你的项目中
+import { Button } from '@/components/ui/button' // 组件在你的代码库中
+```
+
+**核心概念**：
+
+- **CLI 驱动**: 组件通过 CLI 工具添加到项目
+- **代码所有权**: 组件代码完全归你所有，可自由修改
+- **基于 Radix UI**: 底层使用 Radix UI 原语，保证可访问性
+- **Tailwind 样式**: 使用 Tailwind CSS，完全可定制
+- **类型安全**: 完整的 TypeScript 支持
+
+#### 4.4.2 添加组件
+
+```bash
+# ✅ 添加单个组件
+npx shadcn@latest add button
+
+# ✅ 添加多个组件
+npx shadcn@latest add button dialog dropdown-menu
+
+# ✅ 交互式选择组件
+npx shadcn@latest add
+
+# ✅ 查看可用组件列表
+npx shadcn@latest add --help
+```
+
+**添加流程**：
+
+1. 运行 CLI 命令
+2. CLI 从官方仓库下载组件代码
+3. 组件文件被复制到 `components/ui/` 目录
+4. 你可以立即使用和修改组件
+
+#### 4.4.3 使用组件
+
+```typescript
+// ✅ 基本使用
+'use client'
+
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+
+export function CreateProviderDialog() {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>创建提供商</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>新增 API 提供商</DialogTitle>
+        </DialogHeader>
+        {/* 对话框内容 */}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// ✅ 自定义组件样式
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+
+export function CustomButton() {
+  return (
+    <Button
+      className={cn(
+        "bg-gradient-to-r from-blue-500 to-purple-600",
+        "hover:from-blue-600 hover:to-purple-700"
+      )}
+    >
+      渐变按钮
+    </Button>
+  )
+}
+```
+
+#### 4.4.4 组件定制
+
+由于组件代码在你的项目中，你可以直接修改：
+
+```typescript
+// components/ui/button.tsx
+// ✅ 可以直接修改组件代码
+
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
+  size?: 'default' | 'sm' | 'lg' | 'icon'
+
+  // ✅ 添加自定义 variant
+  // 添加新的 loading 状态
+  isLoading?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, isLoading, children, ...props }, ref) => {
+    return (
+      <button
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        disabled={isLoading || props.disabled}
+        {...props}
+      >
+        {isLoading && <Spinner className="mr-2 h-4 w-4" />}
+        {children}
+      </button>
+    )
+  }
+)
+```
+
+#### 4.4.5 组件组合模式
+
+```typescript
+// ✅ 使用组合模式构建复杂 UI
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+
+export function ProviderCard({ provider }: { provider: Provider }) {
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>{provider.name}</CardTitle>
+          <Badge variant={provider.isActive ? 'default' : 'secondary'}>
+            {provider.isActive ? '活跃' : '禁用'}
+          </Badge>
+        </div>
+        <CardDescription>{provider.website}</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <p>API URL: {provider.apiUrl}</p>
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline">编辑</Button>
+        <Button variant="destructive">删除</Button>
+      </CardFooter>
+    </Card>
+  )
+}
+```
+
+#### 4.4.6 常用组件推荐
+
+**表单组件**：
+
+- `input` - 输入框
+- `label` - 标签
+- `button` - 按钮
+- `select` - 选择器
+- `checkbox` - 复选框
+- `radio-group` - 单选按钮组
+- `textarea` - 文本域
+- `form` - 表单（配合 react-hook-form）
+
+**数据展示**：
+
+- `table` - 表格
+- `card` - 卡片
+- `badge` - 徽章
+- `avatar` - 头像
+
+**反馈组件**：
+
+- `dialog` - 对话框
+- `alert` - 警告提示
+- `toast` - 消息提示
+- `progress` - 进度条
+
+**导航组件**：
+
+- `dropdown-menu` - 下拉菜单
+- `tabs` - 标签页
+- `navigation-menu` - 导航菜单
+
+#### 4.4.7 重要规则
+
+**❌ 不要直接使用 Radix UI**：
+
+```typescript
+// ❌ 错误：不要直接导入 Radix UI
+import * as Dialog from '@radix-ui/react-dialog'
+
+// ✅ 正确：使用 shadcn/ui 包装的组件
+import { Dialog } from '@/components/ui/dialog'
+```
+
+**✅ 始终使用 shadcn/ui**：
+
+- shadcn/ui 组件已经正确配置了可访问性
+- 已经集成了 Tailwind 样式
+- 提供了一致的 API 和类型定义
+- 如果需要新的 Radix 功能，通过 shadcn/ui 添加新组件
+
+**配置文件**：
+
+```json
+// components.json - shadcn/ui CLI 配置
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york", // 组件样式风格
+  "rsc": true, // 支持 React Server Components
+  "tsx": true, // 使用 TypeScript
+  "tailwind": {
+    "config": "", // Tailwind v4 无需配置文件
+    "css": "app/globals.css", // 全局样式文件
+    "cssVariables": true // 使用 CSS 变量主题
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils"
+  }
+}
+```
+
+### 4.5 表单处理
 
 ```typescript
 // ✅ 使用 React Hook Form + Zod
@@ -1281,12 +1465,8 @@ export const providers = pgTable('providers', {
   isActive: boolean('is_active').notNull().default(true),
 
   // ✅ 使用 date mode (比 string mode 快 10-15%)
-  createdAt: timestamp('created_at', { mode: 'date', withTimezone: true })
-    .notNull()
-    .defaultNow(),
-  updatedAt: timestamp('updated_at', { mode: 'date', withTimezone: true })
-    .notNull()
-    .defaultNow(),
+  createdAt: timestamp('created_at', { mode: 'date', withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { mode: 'date', withTimezone: true }).notNull().defaultNow(),
 })
 
 // ❌ 避免使用旧的 serial 类型
@@ -1313,8 +1493,10 @@ export const providers = pgTable(
     isActiveIdx: index('providers_is_active_idx').on(table.isActive),
 
     // ✅ 复合索引（注意列顺序）
-    activeCreatedIdx: index('providers_active_created_idx')
-      .on(table.isActive, table.createdAt.desc()),
+    activeCreatedIdx: index('providers_active_created_idx').on(
+      table.isActive,
+      table.createdAt.desc()
+    ),
 
     // ✅ 唯一索引
     apiUrlUnique: uniqueIndex('providers_api_url_unique').on(table.apiUrl),
@@ -1376,10 +1558,7 @@ const activeProviders = await db
   .select()
   .from(providers)
   .where(
-    and(
-      eq(providers.isActive, true),
-      sql`${providers.createdAt} > NOW() - INTERVAL '30 days'`
-    )
+    and(eq(providers.isActive, true), sql`${providers.createdAt} > NOW() - INTERVAL '30 days'`)
   )
   .orderBy(desc(providers.createdAt))
   .limit(10)
@@ -1434,16 +1613,10 @@ const result = await db
 // ✅ 使用事务确保数据一致性
 import { db } from '@/lib/db'
 
-async function createGroupWithProviders(
-  groupData: NewGroup,
-  providerIds: number[]
-) {
+async function createGroupWithProviders(groupData: NewGroup, providerIds: number[]) {
   return await db.transaction(async (tx) => {
     // 1. 创建分组
-    const [group] = await tx
-      .insert(groups)
-      .values(groupData)
-      .returning()
+    const [group] = await tx.insert(groups).values(groupData).returning()
 
     // 2. 关联提供商
     if (providerIds.length > 0) {
@@ -1478,10 +1651,7 @@ export type NewProvider = InferInsertModel<typeof providers>
 
 // 使用
 async function createProvider(data: NewProvider): Promise<Provider> {
-  const [provider] = await db
-    .insert(providers)
-    .values(data)
-    .returning()
+  const [provider] = await db.insert(providers).values(data).returning()
 
   return provider
 }
@@ -1491,9 +1661,9 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 
 export const insertProviderSchema = createInsertSchema(providers, {
   // 自定义验证规则
-  name: z => z.min(1).max(255),
-  apiUrl: z => z.url(),
-  apiKey: z => z.min(10),
+  name: (z) => z.min(1).max(255),
+  apiUrl: (z) => z.url(),
+  apiKey: (z) => z.min(10),
 })
 
 export const selectProviderSchema = createSelectSchema(providers)
@@ -1629,19 +1799,16 @@ export const RedisKeys = {
   endpointHealth: (providerId: number) => `endpoint:health:${providerId}`,
 
   // 轮询权重: polling:weight:{groupId}:{providerId}
-  pollingWeight: (groupId: number, providerId: number) =>
-    `polling:weight:${groupId}:${providerId}`,
+  pollingWeight: (groupId: number, providerId: number) => `polling:weight:${groupId}:${providerId}`,
 
   // 速率限制: ratelimit:{apiKeyId}:{window}
-  rateLimit: (apiKeyId: number, window: number) =>
-    `ratelimit:${apiKeyId}:${window}`,
+  rateLimit: (apiKeyId: number, window: number) => `ratelimit:${apiKeyId}:${window}`,
 
   // 分组端点列表: group:endpoints:{groupId}
   groupEndpoints: (groupId: number) => `group:endpoints:${groupId}`,
 
   // 统计数据: stats:provider:{providerId}:{date}
-  providerStats: (providerId: number, date: string) =>
-    `stats:provider:${providerId}:${date}`,
+  providerStats: (providerId: number, date: string) => `stats:provider:${providerId}:${date}`,
 
   // 分布式锁: lock:endpoint:{providerId}
   endpointLock: (providerId: number) => `lock:endpoint:${providerId}`,
@@ -1651,14 +1818,11 @@ export const RedisKeys = {
 import { redis } from '@/lib/redis'
 import { RedisKeys } from '@/lib/redis-keys'
 
-await redis.hset(
-  RedisKeys.endpointHealth(123),
-  {
-    status: 'healthy',
-    failureCount: 0,
-    lastCheck: Date.now(),
-  }
-)
+await redis.hset(RedisKeys.endpointHealth(123), {
+  status: 'healthy',
+  failureCount: 0,
+  lastCheck: Date.now(),
+})
 ```
 
 ### 6.3 数据结构使用
@@ -1676,10 +1840,7 @@ interface EndpointHealth {
   successRate: number
 }
 
-async function setEndpointHealth(
-  providerId: number,
-  health: EndpointHealth
-): Promise<void> {
+async function setEndpointHealth(providerId: number, health: EndpointHealth): Promise<void> {
   const key = RedisKeys.endpointHealth(providerId)
 
   await redis.hset(key, {
@@ -1695,9 +1856,7 @@ async function setEndpointHealth(
   await redis.expire(key, 300) // 5分钟
 }
 
-async function getEndpointHealth(
-  providerId: number
-): Promise<EndpointHealth | null> {
+async function getEndpointHealth(providerId: number): Promise<EndpointHealth | null> {
   const key = RedisKeys.endpointHealth(providerId)
   const data = await redis.hgetall(key)
 
@@ -1744,17 +1903,12 @@ async function checkRateLimit(
 }
 
 // ✅ 简单缓存
-async function cacheGroupEndpoints(
-  groupId: number,
-  endpoints: Provider[]
-): Promise<void> {
+async function cacheGroupEndpoints(groupId: number, endpoints: Provider[]): Promise<void> {
   const key = RedisKeys.groupEndpoints(groupId)
   await redis.setex(key, 300, JSON.stringify(endpoints))
 }
 
-async function getCachedGroupEndpoints(
-  groupId: number
-): Promise<Provider[] | null> {
+async function getCachedGroupEndpoints(groupId: number): Promise<Provider[] | null> {
   const key = RedisKeys.groupEndpoints(groupId)
   const data = await redis.get(key)
   return data ? JSON.parse(data) : null
@@ -1782,12 +1936,7 @@ async function getTopProviders(
   const key = `group:${groupId}:provider:scores`
 
   // 获取分数最高的 N 个成员
-  const results = await redis.zrevrange(
-    key,
-    0,
-    limit - 1,
-    'WITHSCORES'
-  )
+  const results = await redis.zrevrange(key, 0, limit - 1, 'WITHSCORES')
 
   const providers: Array<{ providerId: number; score: number }> = []
   for (let i = 0; i < results.length; i += 2) {
@@ -1840,13 +1989,7 @@ async function getAllHealthKeys(): Promise<string[]> {
   let cursor = '0'
 
   do {
-    const [nextCursor, scanKeys] = await redis.scan(
-      cursor,
-      'MATCH',
-      pattern,
-      'COUNT',
-      100
-    )
+    const [nextCursor, scanKeys] = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', 100)
     cursor = nextCursor
     keys.push(...scanKeys)
   } while (cursor !== '0')
@@ -1879,10 +2022,7 @@ async function acquireLock(
   return result === 'OK'
 }
 
-async function releaseLock(
-  lockKey: string,
-  lockId: string
-): Promise<boolean> {
+async function releaseLock(lockKey: string, lockId: string): Promise<boolean> {
   // Lua 脚本确保原子性：只有持有锁的客户端才能释放
   const script = `
     if redis.call("get", KEYS[1]) == ARGV[1] then
@@ -2076,21 +2216,14 @@ export async function getProviders() {
   if (session.user.role === 'admin') {
     return await db.select().from(providers)
   } else {
-    return await db
-      .select()
-      .from(providers)
-      .where(eq(providers.isActive, true))
+    return await db.select().from(providers).where(eq(providers.isActive, true))
   }
 }
 
 export async function getProviderById(id: number) {
   const session = await verifySession()
 
-  const [provider] = await db
-    .select()
-    .from(providers)
-    .where(eq(providers.id, id))
-    .limit(1)
+  const [provider] = await db.select().from(providers).where(eq(providers.id, id)).limit(1)
 
   if (!provider) {
     throw new Error('Provider not found')
@@ -2107,18 +2240,12 @@ export async function createProvider(data: NewProvider) {
     throw new Error('Forbidden: Admin access required')
   }
 
-  const [provider] = await db
-    .insert(providers)
-    .values(data)
-    .returning()
+  const [provider] = await db.insert(providers).values(data).returning()
 
   return provider
 }
 
-export async function updateProvider(
-  id: number,
-  data: Partial<Provider>
-) {
+export async function updateProvider(id: number, data: Partial<Provider>) {
   const session = await verifySession()
 
   if (session.user.role !== 'admin') {
@@ -2182,10 +2309,7 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json(
-      { error: 'Invalid JSON' },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
   // 验证数据结构
@@ -2276,26 +2400,15 @@ export async function GET(request: NextRequest) {
 // lib/cors.ts
 import { NextResponse } from 'next/server'
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
-  'http://localhost:3000',
-]
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000']
 
-export function setCorsHeaders(
-  response: NextResponse,
-  origin?: string
-): NextResponse {
+export function setCorsHeaders(response: NextResponse, origin?: string): NextResponse {
   if (origin && allowedOrigins.includes(origin)) {
     response.headers.set('Access-Control-Allow-Origin', origin)
   }
 
-  response.headers.set(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE, OPTIONS'
-  )
-  response.headers.set(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization, X-API-Key'
-  )
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-API-Key')
   response.headers.set('Access-Control-Max-Age', '86400')
 
   return response
@@ -2310,7 +2423,9 @@ export async function OPTIONS(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const data = { /* ... */ }
+  const data = {
+    /* ... */
+  }
   const response = NextResponse.json(data)
   return setCorsHeaders(response, request.headers.get('origin') || undefined)
 }
@@ -2342,12 +2457,7 @@ export function encrypt(text: string, secret: string): string {
   const tag = cipher.getAuthTag()
 
   // 格式: salt:iv:tag:encrypted
-  return [
-    salt.toString('hex'),
-    iv.toString('hex'),
-    tag.toString('hex'),
-    encrypted,
-  ].join(':')
+  return [salt.toString('hex'), iv.toString('hex'), tag.toString('hex'), encrypted].join(':')
 }
 
 export function decrypt(encryptedData: string, secret: string): string {
@@ -2442,14 +2552,7 @@ DATABASE_URL=postgresql://user:pass@host:5432/db?sslmode=require
     "import/order": [
       "error",
       {
-        "groups": [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index"
-        ],
+        "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
         "pathGroups": [
           {
             "pattern": "@/**",
@@ -2475,14 +2578,7 @@ DATABASE_URL=postgresql://user:pass@host:5432/db?sslmode=require
     "prefer-const": "error",
     "no-var": "error"
   },
-  "ignorePatterns": [
-    "node_modules/",
-    ".next/",
-    "out/",
-    "drizzle/",
-    "*.config.js",
-    "*.config.mjs"
-  ]
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "drizzle/", "*.config.js", "*.config.mjs"]
 }
 ```
 
@@ -2545,15 +2641,8 @@ DATABASE_URL=postgresql://user:pass@host:5432/db?sslmode=require
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }
 ```
 
@@ -2570,13 +2659,8 @@ DATABASE_URL=postgresql://user:pass@host:5432/db?sslmode=require
     "type-check": "tsc --noEmit"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,yml}": [
-      "prettier --write"
-    ]
+    "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"],
+    "*.{json,md,yml}": ["prettier --write"]
   }
 }
 ```
@@ -2789,9 +2873,11 @@ Fixes #456
 
 ```markdown
 ## 变更说明
+
 简要描述这个 PR 的目的和变更内容
 
 ## 变更类型
+
 - [ ] 新功能
 - [ ] Bug 修复
 - [ ] 重构
@@ -2799,15 +2885,19 @@ Fixes #456
 - [ ] 性能优化
 
 ## 相关 Issue
+
 Closes #xxx
 
 ## 测试
+
 描述如何测试这些变更
 
 ## 截图（如适用）
+
 添加相关截图
 
 ## Checklist
+
 - [ ] 代码遵循项目规范
 - [ ] 已添加必要的测试
 - [ ] 已更新相关文档
@@ -2847,14 +2937,10 @@ Closes #xxx
  * })
  * // returns: ~87
  */
-export function calculateWeight(
-  basePriority: number,
-  health: EndpointHealth
-): number {
+export function calculateWeight(basePriority: number, health: EndpointHealth): number {
   // 使用指数移动平均是因为它对最近的数据更敏感
   // 这样可以更快地响应性能变化
-  const healthBonus = health.status === 'healthy' ? 20 :
-                      health.status === 'degraded' ? 10 : 0
+  const healthBonus = health.status === 'healthy' ? 20 : health.status === 'degraded' ? 10 : 0
 
   // ...
 }
@@ -2871,7 +2957,7 @@ const user = getUser() // 很明显，不需要注释
 
 ### 11.2 函数文档
 
-```typescript
+````typescript
 /**
  * 更新端点健康状态
  *
@@ -2904,7 +2990,7 @@ export async function updateEndpointHealth(
 ): Promise<void> {
   // 实现
 }
-```
+````
 
 ### 11.3 README 维护
 
@@ -2990,13 +3076,15 @@ const providers = await db
   .from(providers)
 
 // ❌ 避免 SELECT *
-const providers = await db.select().from(providers)
+const providers = await db
+  .select()
+  .from(providers)
 
-// ✅ 使用索引字段进行过滤
-.where(eq(providers.isActive, true)) // isActive 有索引
+  // ✅ 使用索引字段进行过滤
+  .where(eq(providers.isActive, true)) // isActive 有索引
 
-// ✅ 使用 LIMIT 限制结果集
-.limit(100)
+  // ✅ 使用 LIMIT 限制结果集
+  .limit(100)
 
 // ✅ 使用 Prepared Statements
 const getActiveProviders = db
@@ -3115,10 +3203,7 @@ for (const id of providerIds) {
 }
 
 // ✅ 正确做法：使用 IN 查询
-const providerList = await db
-  .select()
-  .from(providers)
-  .where(inArray(providers.id, providerIds))
+const providerList = await db.select().from(providers).where(inArray(providers.id, providerIds))
 
 // ❌ 反模式 2: 过度使用 useEffect
 useEffect(() => {
@@ -3129,7 +3214,7 @@ useEffect(() => {
 const { data } = useSWR('/api/providers', fetcher)
 
 // ❌ 反模式 3: 不处理错误
-const data = await fetch('/api/providers').then(r => r.json())
+const data = await fetch('/api/providers').then((r) => r.json())
 
 // ✅ 正确做法：始终处理错误
 try {
