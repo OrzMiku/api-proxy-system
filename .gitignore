@@ -49,3 +49,11 @@ drizzle/migrations/
 
 # Misc
 .turbo
+
+# Local files
+*.local.*
+
+# Sqlite
+*.sqlite
+*.sqlite3
+*.db

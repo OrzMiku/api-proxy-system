@@ -27,8 +27,8 @@
 **技术栈**:
 
 - Next.js 15 + TypeScript 5.7
-- Drizzle ORM + PostgreSQL
-- Redis (ioredis)
+- Drizzle ORM + SQLite (better-sqlite3)
+- Redis (ioredis / Upstash)
 - NextAuth.js v5
 - Tailwind CSS 4 + shadcn/ui
 
@@ -63,29 +63,29 @@ C:\Dev\personal\claude-code-api-proxy
 
 ---
 
-## 阶段 0: 基础设施搭建 (当前阶段)
+## 阶段 0: 基础设施搭建
 
 **时间估算**: 2-3 天
-**状态**: 🔄 进行中
+**状态**: ✅ 已完成
 
 ### 0.1 数据库设计与配置
 
 #### 任务清单
 
-- [ ] **数据库 Schema 设计**
-  - [ ] 创建 `schema/providers.ts` - 提供商表
-  - [ ] 创建 `schema/groups.ts` - 分组表
-  - [ ] 创建 `schema/group-providers.ts` - 分组-提供商关联表
-  - [ ] 创建 `schema/api-keys.ts` - API Key 表
-  - [ ] 创建 `schema/users.ts` - 用户表
-  - [ ] 创建 `schema/request-logs.ts` - 请求日志表
-  - [ ] 创建 `schema/index.ts` - 统一导出
+- [x] **数据库 Schema 设计**
+  - [x] 创建 `schema/providers.ts` - 提供商表
+  - [x] 创建 `schema/groups.ts` - 分组表
+  - [x] 创建 `schema/group-providers.ts` - 分组-提供商关联表
+  - [x] 创建 `schema/api-keys.ts` - API Key 表
+  - [x] 创建 `schema/users.ts` - 用户表
+  - [x] 创建 `schema/request-logs.ts` - 请求日志表
+  - [x] 创建 `schema/index.ts` - 统一导出
 
-- [ ] **Drizzle ORM 配置**
-  - [ ] 配置数据库连接 (`lib/db.ts`)
-  - [ ] 配置 `drizzle.config.ts`
-  - [ ] 生成初始迁移文件 (`pnpm db:generate`)
-  - [ ] 测试数据库连接
+- [x] **Drizzle ORM 配置**
+  - [x] 配置数据库连接 (`lib/db.ts`)
+  - [x] 配置 `drizzle.config.ts`
+  - [x] 生成初始迁移文件 (`pnpm db:generate`)
+  - [x] 测试数据库连接
 
 #### 验收标准
 
@@ -100,11 +100,11 @@ C:\Dev\personal\claude-code-api-proxy
 
 #### 任务清单
 
-- [ ] **Redis 客户端配置**
-  - [ ] 创建 `lib/redis.ts` - Redis 单例连接
-  - [ ] 创建 `lib/redis-keys.ts` - Redis Key 命名工具
-  - [ ] 测试 Redis 连接
-  - [ ] 配置 Redis 数据结构 (健康状态、权重、速率限制等)
+- [x] **Redis 客户端配置**
+  - [x] 创建 `lib/redis.ts` - Redis 单例连接
+  - [x] 创建 `lib/redis-keys.ts` - Redis Key 命名工具
+  - [x] 测试 Redis 连接
+  - [x] 配置 Redis 数据结构 (健康状态、权重、速率限制等)
 
 #### 验收标准
 
@@ -118,17 +118,17 @@ C:\Dev\personal\claude-code-api-proxy
 
 #### 任务清单
 
-- [ ] **NextAuth.js 配置**
-  - [ ] 创建 `lib/auth.ts` - NextAuth 配置
-  - [ ] 创建 `app/api/auth/[...nextauth]/route.ts` - Auth API 路由
-  - [ ] 创建 `lib/dal.ts` - 数据访问层 (安全封装)
-  - [ ] 配置 Credentials Provider (用户名密码登录)
-  - [ ] 添加会话管理
+- [x] **NextAuth.js 配置**
+  - [x] 创建 `lib/auth.ts` - NextAuth 配置
+  - [x] 创建 `app/api/auth/[...nextauth]/route.ts` - Auth API 路由
+  - [x] 创建 `lib/dal.ts` - 数据访问层 (安全封装)
+  - [x] 配置 Credentials Provider (用户名密码登录)
+  - [x] 添加会话管理
 
-- [ ] **登录页面**
-  - [ ] 创建 `app/(auth)/login/page.tsx`
-  - [ ] 创建登录表单组件
-  - [ ] 实现登录逻辑
+- [x] **登录页面**
+  - [x] 创建 `app/(auth)/login/page.tsx`
+  - [x] 创建登录表单组件
+  - [x] 实现登录逻辑
 
 #### 验收标准
 
@@ -142,7 +142,7 @@ C:\Dev\personal\claude-code-api-proxy
 
 #### 任务清单
 
-- [ ] **安装核心 UI 组件**
+- [x] **安装核心 UI 组件**
 
   ```bash
   npx shadcn@latest add button
@@ -159,9 +159,9 @@ C:\Dev\personal\claude-code-api-proxy
   npx shadcn@latest add form
   ```
 
-- [ ] **测试组件**
-  - [ ] 创建组件展示页面 (开发用)
-  - [ ] 验证所有组件正常渲染
+- [x] **测试组件**
+  - [x] 创建组件展示页面 (开发用)
+  - [x] 验证所有组件正常渲染
 
 #### 验收标准
 
@@ -174,11 +174,11 @@ C:\Dev\personal\claude-code-api-proxy
 
 #### 任务清单
 
-- [ ] **创建工具函数**
-  - [ ] `lib/utils.ts` - 通用工具 (已存在，需完善)
-  - [ ] `lib/validations.ts` - Zod 验证 schemas
-  - [ ] `lib/encryption.ts` - API Key 加密工具
-  - [ ] `lib/logger.ts` - 日志工具 (Pino)
+- [x] **创建工具函数**
+  - [x] `lib/utils.ts` - 通用工具 (已存在，需完善)
+  - [x] `lib/validations.ts` - Zod 验证 schemas
+  - [x] `lib/encryption.ts` - API Key 加密工具
+  - [x] `lib/logger.ts` - 日志工具 (Pino)
 
 #### 验收标准
 
@@ -187,29 +187,35 @@ C:\Dev\personal\claude-code-api-proxy
 
 ---
 
-## 阶段 1: MVP 核心功能
+## 阶段 1: MVP 核心功能 (当前阶段)
 
 **时间估算**: 2-3 周
+**状态**: 🔄 进行中
 **目标**: 实现最小可行产品，能够基本使用代理功能
 
 ### 1.1 提供商管理 (CRUD)
 
 #### 任务清单
 
-- [ ] **后端 API**
-  - [ ] `app/api/admin/providers/route.ts` - GET (列表) / POST (创建)
-  - [ ] `app/api/admin/providers/[id]/route.ts` - GET (详情) / PUT (更新) / DELETE (删除)
-  - [ ] `app/api/admin/providers/[id]/toggle/route.ts` - PATCH (启用/禁用)
+- [x] **后端 API**
+  - [x] `app/api/admin/providers/route.ts` - GET (列表) / POST (创建)
+  - [x] `app/api/admin/providers/[id]/route.ts` - GET (详情) / PUT (更新) / DELETE (删除)
+  - [x] `app/api/admin/providers/[id]/toggle/route.ts` - PATCH (启用/禁用)
 
-- [ ] **前端页面**
-  - [ ] `app/admin/providers/page.tsx` - 提供商列表页
-  - [ ] `app/admin/providers/columns.tsx` - 表格列定义
-  - [ ] `components/providers/provider-form.tsx` - 提供商表单
-  - [ ] `components/providers/provider-dialog.tsx` - 新增/编辑对话框
+- [x] **前端页面**
+  - [x] `app/admin/providers/page.tsx` - 提供商列表页
+  - [x] `components/providers/provider-form.tsx` - 提供商表单
+  - [x] `components/providers/provider-dialog.tsx` - 新增/编辑对话框
 
-- [ ] **数据验证**
-  - [ ] 添加 Zod schemas 到 `lib/validations.ts`
-  - [ ] 前后端验证一致性
+- [x] **数据验证**
+  - [x] 添加 Zod schemas 到 `lib/validations.ts`
+  - [x] 前后端验证一致性
+  - [x] 修复 react-hook-form 类型推断问题（使用 z.input<>）
+
+- [x] **技术问题解决**
+  - [x] 数据库从 PostgreSQL 切换到 SQLite
+  - [x] 修复 Edge Runtime 兼容性问题（auth.ts 动态导入）
+  - [x] 清理 .next 缓存并重新构建
 
 #### 验收标准
 
@@ -217,6 +223,8 @@ C:\Dev\personal\claude-code-api-proxy
 - ✅ 表单验证正常工作
 - ✅ 数据正确保存到数据库
 - ✅ UI 交互流畅
+- ✅ 开发服务器正常运行（http://localhost:3000）
+- ✅ Middleware 正常工作（未认证用户被重定向）
 
 ---
 
@@ -224,23 +232,41 @@ C:\Dev\personal\claude-code-api-proxy
 
 #### 任务清单
 
-- [ ] **后端 API**
-  - [ ] `app/api/admin/groups/route.ts` - GET / POST
-  - [ ] `app/api/admin/groups/[id]/route.ts` - GET / PUT / DELETE
-  - [ ] `app/api/admin/groups/[id]/providers/route.ts` - POST (添加提供商)
-  - [ ] `app/api/admin/groups/[id]/providers/[providerId]/route.ts` - DELETE (移除提供商)
+- [x] **后端 API**
+  - [x] `app/api/admin/groups/route.ts` - GET / POST
+  - [x] `app/api/admin/groups/[id]/route.ts` - GET / PUT / DELETE
+  - [x] `app/api/admin/groups/[id]/toggle/route.ts` - PATCH (切换启用状态)
+  - [x] `app/api/admin/groups/[id]/providers/route.ts` - GET / POST (获取/添加提供商)
+  - [x] `app/api/admin/groups/[id]/providers/[providerId]/route.ts` - DELETE / PATCH (删除/更新提供商关系)
 
-- [ ] **前端页面**
-  - [ ] `app/admin/groups/page.tsx` - 分组列表页
-  - [ ] `app/admin/groups/[id]/page.tsx` - 分组详情页
-  - [ ] `components/groups/group-form.tsx` - 分组表单
-  - [ ] `components/groups/group-providers.tsx` - 分组提供商管理
+- [x] **前端页面**
+  - [x] `app/admin/groups/page.tsx` - 分组列表页
+  - [x] `app/admin/groups/[id]/page.tsx` - 分组详情页（管理提供商）
+  - [x] `components/groups/group-form.tsx` - 分组表单
+  - [x] `components/groups/group-dialog.tsx` - 分组对话框
+  - [x] `components/groups/add-provider-dialog.tsx` - 添加提供商对话框
+
+- [x] **类型修复**
+  - [x] 修复 groupSchema 的 Zod 类型推断问题（使用 z.input<>）
+  - [x] 修复 params 索引签名访问问题
+
+- [x] **分组-提供商管理功能**
+  - [x] 添加提供商到分组
+  - [x] 从分组移除提供商
+  - [x] 调整提供商优先级（+10/-10 按钮）
+  - [x] 切换提供商在分组中的启用状态
+  - [x] 显示提供商全局状态和分组内状态
 
 #### 验收标准
 
+- ✅ 能够创建、查看、编辑、删除分组
+- ✅ 表单验证正常工作（slug 格式验证）
+- ✅ 数据正确保存到数据库
+- ✅ 轮询策略选择功能正常
 - ✅ 能够管理分组和分组内的提供商
 - ✅ 能够设置提供商优先级
 - ✅ UI 显示正确的分组关系
+- ✅ 分组详情页正常显示和操作
 
 ---
 
@@ -301,14 +327,19 @@ C:\Dev\personal\claude-code-api-proxy
 
 #### 任务清单
 
-- [ ] **布局和导航**
-  - [ ] `app/admin/layout.tsx` - 管理后台布局
-  - [ ] `components/layout/admin-nav.tsx` - 侧边栏导航
+- [x] **布局和导航**
+  - [x] `app/admin/layout.tsx` - 管理后台布局
+  - [x] `components/layout/admin-nav.tsx` - 侧边栏导航
   - [ ] `components/layout/admin-header.tsx` - 顶部导航
 
-- [ ] **仪表盘**
-  - [ ] `app/admin/page.tsx` - 仪表盘首页
-  - [ ] 显示基础统计数据 (提供商数量、分组数量、API Key 数量)
+- [x] **仪表盘**
+  - [x] `app/admin/page.tsx` - 仪表盘首页
+  - [x] 显示基础统计数据 (提供商数量、分组数量、API Key 数量)
+
+- [x] **登录系统**
+  - [x] `app/(auth)/login/page.tsx` - 登录页面
+  - [x] `scripts/seed.ts` - 数据库种子脚本
+  - [x] 默认管理员账户创建
 
 #### 验收标准
 

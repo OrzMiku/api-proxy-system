@@ -1,6 +1,17 @@
 {
   "permissions": {
-    "allow": ["mcp__context7__resolve-library-id", "mcp__context7__get-library-docs", "WebSearch"],
+    "allow": [
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs",
+      "WebSearch",
+      "Bash(mkdir:*)",
+      "Bash(pnpm:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(grep:*)",
+      "Bash(touch:*)",
+      "Bash(echo:*)"
+    ],
     "deny": [],
     "ask": []
   }
