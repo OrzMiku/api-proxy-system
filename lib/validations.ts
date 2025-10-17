@@ -85,14 +85,16 @@ export const apiKeySchema = z.object({
   description: z.string().optional(),
   userId: z.number().int().positive().optional(),
   groupId: z.number().int().positive().optional(), // null = global key
-  isEnabled: z.boolean().default(true),
-  rateLimit: z.number().int().min(1).max(100000).default(100), // Requests per minute
+  isEnabled: z.boolean().optional().default(true),
+  rateLimit: z.number().int().min(1).max(100000).optional().default(100), // Requests per minute
   expiresAt: z.date().optional(),
 })
 
 export const updateApiKeySchema = apiKeySchema.partial().required({ name: true })
 
-export type ApiKeyInput = z.infer<typeof apiKeySchema>
+// Use z.input to get the input type (with optional fields before defaults are applied)
+export type ApiKeyInput = z.input<typeof apiKeySchema>
+export type ApiKeyOutput = z.output<typeof apiKeySchema>
 export type UpdateApiKeyInput = z.infer<typeof updateApiKeySchema>
 
 // ============================================
