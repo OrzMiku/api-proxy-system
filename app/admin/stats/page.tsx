@@ -91,7 +91,12 @@ export default function StatsPage() {
 
       setProviders(providersData.providers || [])
       setRecentRequests(requestsData.requests || [])
-      setOverview(overviewData)
+
+      // Only set overview if it has the expected structure
+      if (overviewData && overviewData.overview) {
+        setOverview(overviewData)
+      }
+
       setLoading(false)
     } catch (error) {
       console.error('Failed to fetch stats:', error)
@@ -101,7 +106,7 @@ export default function StatsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <div className="text-gray-500">加载中...</div>
       </div>
     )
@@ -115,7 +120,7 @@ export default function StatsPage() {
       </div>
 
       {/* Overview Stats */}
-      {overview && (
+      {overview?.overview && (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -230,7 +235,9 @@ export default function StatsPage() {
                   <TableCell>
                     <div className="text-sm">
                       <div>总计: {provider.stats.totalRequests}</div>
-                      <div className="text-green-600">成功: {provider.stats.successfulRequests}</div>
+                      <div className="text-green-600">
+                        成功: {provider.stats.successfulRequests}
+                      </div>
                       {provider.stats.failedRequests > 0 && (
                         <div className="text-red-600">失败: {provider.stats.failedRequests}</div>
                       )}
@@ -277,13 +284,9 @@ export default function StatsPage() {
                   <TableCell className="text-xs">{request.providerName || '-'}</TableCell>
                   <TableCell>
                     {request.success ? (
-                      <Badge className="bg-green-600">
-                        {request.statusCode || 200}
-                      </Badge>
+                      <Badge className="bg-green-600">{request.statusCode || 200}</Badge>
                     ) : (
-                      <Badge variant="destructive">
-                        {request.statusCode || 500}
-                      </Badge>
+                      <Badge variant="destructive">{request.statusCode || 500}</Badge>
                     )}
                   </TableCell>
                   <TableCell className="text-xs">

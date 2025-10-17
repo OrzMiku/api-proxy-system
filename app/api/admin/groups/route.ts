@@ -72,10 +72,7 @@ export async function POST(request: NextRequest) {
     logger.error({ err: error }, 'Failed to create group')
 
     if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
-      return NextResponse.json(
-        { error: 'Group name or slug already exists' },
-        { status: 409 }
-      )
+      return NextResponse.json({ error: 'Group name or slug already exists' }, { status: 409 })
     }
 
     return NextResponse.json({ error: 'Failed to create group' }, { status: 500 })

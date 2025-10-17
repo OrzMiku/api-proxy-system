@@ -91,12 +91,7 @@ export function ProviderForm({ defaultValues, onSubmit, submitLabel = '保存' }
             <FormItem>
               <FormLabel>API Key (可选)</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="sk_..."
-                  {...field}
-                  value={field.value || ''}
-                />
+                <Input type="password" placeholder="sk_..." {...field} value={field.value || ''} />
               </FormControl>
               <FormDescription>提供商的 API 密钥（将加密存储）</FormDescription>
               <FormMessage />
@@ -111,11 +106,7 @@ export function ProviderForm({ defaultValues, onSubmit, submitLabel = '保存' }
             <FormItem>
               <FormLabel>描述 (可选)</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="关于这个提供商的说明"
-                  {...field}
-                  value={field.value || ''}
-                />
+                <Input placeholder="关于这个提供商的说明" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -165,7 +156,7 @@ export function ProviderForm({ defaultValues, onSubmit, submitLabel = '保存' }
         <FormField
           control={form.control}
           name="isEnabled"
-          render={({ field}) => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>状态</FormLabel>
               <Select

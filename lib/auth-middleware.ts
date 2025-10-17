@@ -111,11 +111,7 @@ export async function verifyApiKey(apiKey: string): Promise<AuthenticatedApiKey>
   }
 
   // Cache the key details in Redis
-  await redis.setex(
-    cacheKey,
-    RedisTTL.API_KEY_CACHE,
-    JSON.stringify(authenticatedKey)
-  )
+  await redis.setex(cacheKey, RedisTTL.API_KEY_CACHE, JSON.stringify(authenticatedKey))
 
   logger.info({ apiKeyId: matchedKey.id, name: matchedKey.name }, 'API key verified successfully')
 

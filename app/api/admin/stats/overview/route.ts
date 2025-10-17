@@ -51,9 +51,6 @@ export async function GET(_request: NextRequest) {
     })
   } catch (error) {
     console.error('Failed to get overview stats:', error)
-    return NextResponse.json(
-      { error: 'Failed to get overview statistics' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to get overview statistics' }, { status: 500 })
   }
 }

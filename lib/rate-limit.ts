@@ -22,10 +22,7 @@ export type RateLimitResult = {
  *   return Response with 429 status
  * }
  */
-export async function checkRateLimit(
-  apiKeyId: number,
-  limit: number
-): Promise<RateLimitResult> {
+export async function checkRateLimit(apiKeyId: number, limit: number): Promise<RateLimitResult> {
   const windowMs = 60000 // 1 minute in milliseconds
   const now = Date.now()
   const windowKey = Math.floor(now / windowMs)
@@ -46,10 +43,7 @@ export async function checkRateLimit(
     const reset = (windowKey + 1) * windowMs
 
     if (!allowed) {
-      logger.warn(
-        { apiKeyId, count, limit },
-        'Rate limit exceeded'
-      )
+      logger.warn({ apiKeyId, count, limit }, 'Rate limit exceeded')
     }
 
     return {

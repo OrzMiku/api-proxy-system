@@ -41,9 +41,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ requests: recentRequests })
   } catch (error) {
     console.error('Failed to get recent requests:', error)
-    return NextResponse.json(
-      { error: 'Failed to get recent requests' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to get recent requests' }, { status: 500 })
   }
 }

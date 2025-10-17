@@ -27,7 +27,11 @@ export async function GET(_request: NextRequest, context: RouteContext) {
 
     const providerId = validation.data.id
 
-    const [provider] = await db.select().from(providers).where(eq(providers.id, providerId)).limit(1)
+    const [provider] = await db
+      .select()
+      .from(providers)
+      .where(eq(providers.id, providerId))
+      .limit(1)
 
     if (!provider) {
       return NextResponse.json({ error: 'Provider not found' }, { status: 404 })

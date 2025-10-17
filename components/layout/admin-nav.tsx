@@ -10,7 +10,7 @@ import {
   Key,
   BarChart3,
   Settings,
-  LogOut
+  LogOut,
 } from 'lucide-react'
 import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
@@ -86,11 +86,7 @@ export function AdminNav() {
       </nav>
 
       <div className="border-t p-4">
-        <Button
-          variant="outline"
-          className="w-full justify-start"
-          onClick={handleSignOut}
-        >
+        <Button variant="outline" className="w-full justify-start" onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           退出登录
         </Button>

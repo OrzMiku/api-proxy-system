@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, PowerOff, Power, Settings } from 'lucide-react'
 import { toast } from 'sonner'
 import { GroupDialog } from '@/components/groups/group-dialog'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 
 type Group = {
   id: number
@@ -34,6 +35,8 @@ export default function GroupsPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingGroup, setEditingGroup] = useState<Group | null>(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deletingGroupId, setDeletingGroupId] = useState<number | null>(null)
 
   const fetchGroups = async () => {
     try {
@@ -67,11 +70,16 @@ export default function GroupsPage() {
     }
   }
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定要删除这个分组吗？此操作将同时删除关联的提供商关系。')) return
+  const handleDelete = (id: number) => {
+    setDeletingGroupId(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!deletingGroupId) return
 
     try {
-      const response = await fetch(`/api/admin/groups/${id}`, {
+      const response = await fetch(`/api/admin/groups/${deletingGroupId}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete group')
@@ -80,6 +88,8 @@ export default function GroupsPage() {
     } catch (error) {
       toast.error('删除失败')
       console.error(error)
+    } finally {
+      setDeletingGroupId(null)
     }
   }
 
@@ -103,6 +113,7 @@ export default function GroupsPage() {
   const getPollingStrategyLabel = (strategy: string) => {
     const labels: Record<string, string> = {
       'weighted-round-robin': '加权轮询',
+      'priority-failover': '优先级故障转移',
       'least-connections': '最少连接',
       'ip-hash': 'IP Hash',
       random: '随机',
@@ -113,7 +124,7 @@ export default function GroupsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <p className="text-gray-500">加载中...</p>
       </div>
     )
@@ -139,7 +150,7 @@ export default function GroupsPage() {
         </CardHeader>
         <CardContent>
           {groups.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <p className="text-gray-500">暂无分组</p>
               <Button onClick={() => setDialogOpen(true)} variant="outline" className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
@@ -163,7 +174,7 @@ export default function GroupsPage() {
                   <TableRow key={group.id}>
                     <TableCell className="font-medium">{group.name}</TableCell>
                     <TableCell>
-                      <code className="text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
+                      <code className="rounded bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800">
                         {group.slug}
                       </code>
                     </TableCell>
@@ -172,7 +183,7 @@ export default function GroupsPage() {
                         {getPollingStrategyLabel(group.pollingStrategy)}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-sm text-gray-600 max-w-xs truncate">
+                    <TableCell className="max-w-xs truncate text-sm text-gray-600">
                       {group.description || '-'}
                     </TableCell>
                     <TableCell>
@@ -188,7 +199,7 @@ export default function GroupsPage() {
                           onClick={() => handleManageProviders(group.id)}
                           title="管理提供商"
                         >
-                          <Settings className="h-4 w-4 mr-1" />
+                          <Settings className="mr-1 h-4 w-4" />
                           提供商
                         </Button>
                         <Button
@@ -198,9 +209,9 @@ export default function GroupsPage() {
                           title={group.isEnabled ? '禁用' : '启用'}
                         >
                           {group.isEnabled ? (
-                            <PowerOff className="h-4 w-4 mr-1" />
+                            <PowerOff className="mr-1 h-4 w-4" />
                           ) : (
-                            <Power className="h-4 w-4 mr-1" />
+                            <Power className="mr-1 h-4 w-4" />
                           )}
                           {group.isEnabled ? '禁用' : '启用'}
                         </Button>
@@ -210,7 +221,7 @@ export default function GroupsPage() {
                           onClick={() => handleEdit(group)}
                           title="编辑"
                         >
-                          <Pencil className="h-4 w-4 mr-1" />
+                          <Pencil className="mr-1 h-4 w-4" />
                           编辑
                         </Button>
                         <Button
@@ -219,7 +230,7 @@ export default function GroupsPage() {
                           onClick={() => handleDelete(group.id)}
                           title="删除"
                         >
-                          <Trash2 className="h-4 w-4 mr-1" />
+                          <Trash2 className="mr-1 h-4 w-4" />
                           删除
                         </Button>
                       </div>
@@ -233,6 +244,17 @@ export default function GroupsPage() {
       </Card>
 
       <GroupDialog open={dialogOpen} onClose={handleDialogClose} group={editingGroup} />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        onConfirm={confirmDelete}
+        title="删除分组"
+        description="确定要删除这个分组吗？此操作将同时删除关联的提供商关系。"
+        confirmText="删除"
+        cancelText="取消"
+        variant="destructive"
+      />
     </div>
   )
 }

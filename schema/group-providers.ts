@@ -19,8 +19,12 @@ export const groupProviders = sqliteTable(
       .references(() => providers.id, { onDelete: 'cascade' }),
     priority: integer('priority').notNull().default(100), // Group-specific priority override
     isEnabled: integer('is_enabled', { mode: 'boolean' }).notNull().default(true),
-    createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-    updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+    createdAt: integer('created_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
+    updatedAt: integer('updated_at', { mode: 'timestamp' })
+      .notNull()
+      .default(sql`(unixepoch())`),
   },
   (table) => ({
     // Ensure each provider can only be added once per group

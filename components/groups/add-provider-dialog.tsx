@@ -132,9 +132,7 @@ export function AddProviderDialog({
         ) : providers.length === 0 ? (
           <div className="py-8 text-center">
             <p className="text-gray-500">没有可添加的提供商</p>
-            <p className="text-sm text-gray-400 mt-2">
-              所有提供商都已在此分组中，或者暂无提供商
-            </p>
+            <p className="mt-2 text-sm text-gray-400">所有提供商都已在此分组中，或者暂无提供商</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -149,7 +147,10 @@ export function AddProviderDialog({
                     <SelectItem key={provider.id} value={provider.id.toString()}>
                       <div className="flex items-center gap-2">
                         <span>{provider.name}</span>
-                        <Badge variant={provider.isEnabled ? 'default' : 'outline'} className="ml-2">
+                        <Badge
+                          variant={provider.isEnabled ? 'default' : 'outline'}
+                          className="ml-2"
+                        >
                           {provider.isEnabled ? '启用' : '禁用'}
                         </Badge>
                       </div>

@@ -14,8 +14,12 @@ export const providers = sqliteTable('providers', {
   priority: integer('priority').notNull().default(100), // Default priority weight
   timeout: integer('timeout').notNull().default(30000), // Request timeout in ms
   metadata: text('metadata'), // JSON string for additional config
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
 })
 
 export type Provider = typeof providers.$inferSelect

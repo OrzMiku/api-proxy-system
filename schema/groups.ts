@@ -12,10 +12,14 @@ export const groups = sqliteTable('groups', {
   isEnabled: integer('is_enabled', { mode: 'boolean' }).notNull().default(true),
   pollingStrategy: text('polling_strategy', { length: 50 })
     .notNull()
-    .default('weighted-round-robin'), // 'weighted-round-robin', 'least-connections', 'ip-hash', 'random', 'round-robin'
+    .default('weighted-round-robin'), // 'weighted-round-robin', 'priority-failover', 'least-connections', 'ip-hash', 'random', 'round-robin'
   metadata: text('metadata'), // JSON string for additional config
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
 })
 
 export type Group = typeof groups.$inferSelect

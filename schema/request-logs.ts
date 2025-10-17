@@ -24,7 +24,9 @@ export const requestLogs = sqliteTable('request_logs', {
   requestSize: integer('request_size'), // Request body size in bytes
   responseSize: integer('response_size'), // Response body size in bytes
   metadata: text('metadata'), // JSON string for additional info
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
 })
 
 export type RequestLog = typeof requestLogs.$inferSelect

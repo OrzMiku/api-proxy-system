@@ -10,11 +10,7 @@ export const metadata: Metadata = {
   description: '智能聚合多个相同接口格式的 API 端点，提供统一访问、自动故障转移和负载均衡',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <body className={inter.className}>

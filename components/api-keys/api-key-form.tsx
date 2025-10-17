@@ -113,11 +113,7 @@ export function ApiKeyForm({
             <FormItem>
               <FormLabel>描述 (可选)</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="关于这个 API Key 的说明"
-                  {...field}
-                  value={field.value || ''}
-                />
+                <Input placeholder="关于这个 API Key 的说明" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -131,7 +127,9 @@ export function ApiKeyForm({
             <FormItem>
               <FormLabel>关联分组 (可选)</FormLabel>
               <Select
-                onValueChange={(value) => field.onChange(value === 'global' ? undefined : parseInt(value))}
+                onValueChange={(value) =>
+                  field.onChange(value === 'global' ? undefined : parseInt(value))
+                }
                 defaultValue={field.value ? field.value.toString() : 'global'}
                 disabled={loadingGroups}
               >
@@ -149,9 +147,7 @@ export function ApiKeyForm({
                   ))}
                 </SelectContent>
               </Select>
-              <FormDescription>
-                全局 Key 可访问所有分组，分组 Key 只能访问指定分组
-              </FormDescription>
+              <FormDescription>全局 Key 可访问所有分组，分组 Key 只能访问指定分组</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -188,11 +184,7 @@ export function ApiKeyForm({
                 <Input
                   type="datetime-local"
                   {...field}
-                  value={
-                    field.value
-                      ? new Date(field.value).toISOString().slice(0, 16)
-                      : ''
-                  }
+                  value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
                   onChange={(e) =>
                     field.onChange(e.target.value ? new Date(e.target.value) : undefined)
                   }

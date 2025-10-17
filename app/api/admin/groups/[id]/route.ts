@@ -10,10 +10,7 @@ import { eq } from 'drizzle-orm'
  * GET /api/admin/groups/[id]
  * Get a specific group by ID
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await verifyAdminAuth()
     const { id } = await params
@@ -36,10 +33,7 @@ export async function GET(
  * PUT /api/admin/groups/[id]
  * Update a group
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await verifyAdminAuth()
     const { id } = await params
@@ -78,10 +72,7 @@ export async function PUT(
     logger.error({ err: error }, 'Failed to update group')
 
     if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
-      return NextResponse.json(
-        { error: 'Group name or slug already exists' },
-        { status: 409 }
-      )
+      return NextResponse.json({ error: 'Group name or slug already exists' }, { status: 409 })
     }
 
     return NextResponse.json({ error: 'Failed to update group' }, { status: 500 })

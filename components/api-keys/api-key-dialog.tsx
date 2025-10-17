@@ -120,7 +120,7 @@ export function ApiKeyDialog({ open, onClose, apiKey }: ApiKeyDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEdit ? '编辑 API Key' : '新增 API Key'}</DialogTitle>
           <DialogDescription>
@@ -132,14 +132,15 @@ export function ApiKeyDialog({ open, onClose, apiKey }: ApiKeyDialogProps) {
           <div className="space-y-4">
             <Alert>
               <AlertDescription>
-                <strong>重要提示：</strong>请立即复制并保存此 API Key，关闭此对话框后将无法再次查看。
+                <strong>重要提示：</strong>请立即复制并保存此 API
+                Key，关闭此对话框后将无法再次查看。
               </AlertDescription>
             </Alert>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">您的 API Key</label>
               <div className="flex gap-2">
-                <code className="flex-1 p-3 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono break-all">
+                <code className="flex-1 rounded bg-gray-100 p-3 font-mono text-sm break-all dark:bg-gray-800">
                   {newlyCreatedKey}
                 </code>
                 <Button
@@ -155,9 +156,7 @@ export function ApiKeyDialog({ open, onClose, apiKey }: ApiKeyDialogProps) {
             </div>
 
             <div className="flex justify-end gap-2 pt-4">
-              <Button onClick={() => handleClose()}>
-                我已复制，关闭
-              </Button>
+              <Button onClick={() => handleClose()}>我已复制，关闭</Button>
             </div>
           </div>
         ) : loading ? (

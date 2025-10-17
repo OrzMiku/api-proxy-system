@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Plus, Trash2, PowerOff, Power, ChevronUp, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
 import { AddProviderDialog } from '@/components/groups/add-provider-dialog'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 
 type Group = {
   id: number
@@ -51,6 +52,8 @@ export default function GroupDetailPage() {
   const [groupProviders, setGroupProviders] = useState<GroupProvider[]>([])
   const [loading, setLoading] = useState(true)
   const [addDialogOpen, setAddDialogOpen] = useState(false)
+  const [removeConfirmOpen, setRemoveConfirmOpen] = useState(false)
+  const [removingProviderId, setRemovingProviderId] = useState<number | null>(null)
 
   const fetchGroup = async () => {
     try {
@@ -90,14 +93,11 @@ export default function GroupDetailPage() {
     if (!provider) return
 
     try {
-      const response = await fetch(
-        `/api/admin/groups/${groupId}/providers/${providerId}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ isEnabled: !provider.isEnabled }),
-        }
-      )
+      const response = await fetch(`/api/admin/groups/${groupId}/providers/${providerId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isEnabled: !provider.isEnabled }),
+      })
       if (!response.ok) throw new Error('Failed to toggle provider')
       toast.success('提供商状态已更新')
       fetchGroupProviders()
@@ -107,20 +107,26 @@ export default function GroupDetailPage() {
     }
   }
 
-  const handleRemoveProvider = async (providerId: number) => {
-    if (!confirm('确定要从此分组移除该提供商吗？')) return
+  const handleRemoveProvider = (providerId: number) => {
+    setRemovingProviderId(providerId)
+    setRemoveConfirmOpen(true)
+  }
+
+  const confirmRemoveProvider = async () => {
+    if (!removingProviderId) return
 
     try {
-      const response = await fetch(
-        `/api/admin/groups/${groupId}/providers/${providerId}`,
-        { method: 'DELETE' }
-      )
+      const response = await fetch(`/api/admin/groups/${groupId}/providers/${removingProviderId}`, {
+        method: 'DELETE',
+      })
       if (!response.ok) throw new Error('Failed to remove provider')
       toast.success('提供商已移除')
       fetchGroupProviders()
     } catch (error) {
       toast.error('移除失败')
       console.error(error)
+    } finally {
+      setRemovingProviderId(null)
     }
   }
 
@@ -131,14 +137,11 @@ export default function GroupDetailPage() {
     }
 
     try {
-      const response = await fetch(
-        `/api/admin/groups/${groupId}/providers/${providerId}`,
-        {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ priority: newPriority }),
-        }
-      )
+      const response = await fetch(`/api/admin/groups/${groupId}/providers/${providerId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ priority: newPriority }),
+      })
       if (!response.ok) throw new Error('Failed to update priority')
       toast.success('优先级已更新')
       fetchGroupProviders()
@@ -158,6 +161,7 @@ export default function GroupDetailPage() {
   const getPollingStrategyLabel = (strategy: string) => {
     const labels: Record<string, string> = {
       'weighted-round-robin': '加权轮询',
+      'priority-failover': '优先级故障转移',
       'least-connections': '最少连接',
       'ip-hash': 'IP Hash',
       random: '随机',
@@ -168,7 +172,7 @@ export default function GroupDetailPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <p className="text-gray-500">加载中...</p>
       </div>
     )
@@ -176,8 +180,8 @@ export default function GroupDetailPage() {
 
   if (!group) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <p className="text-gray-500 mb-4">分组不存在</p>
+      <div className="flex h-64 flex-col items-center justify-center">
+        <p className="mb-4 text-gray-500">分组不存在</p>
         <Button onClick={() => router.push('/admin/groups')}>返回分组列表</Button>
       </div>
     )
@@ -187,13 +191,16 @@ export default function GroupDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="outline" size="sm" onClick={() => router.push('/admin/groups')}>
-          <ArrowLeft className="h-4 w-4 mr-1" />
+          <ArrowLeft className="mr-1 h-4 w-4" />
           返回
         </Button>
         <div className="flex-1">
           <h1 className="text-3xl font-bold">{group.name}</h1>
           <p className="text-gray-600 dark:text-gray-400">
-            管理分组中的提供商 · Slug: <code className="text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">{group.slug}</code>
+            管理分组中的提供商 · Slug:{' '}
+            <code className="rounded bg-gray-100 px-2 py-1 text-sm dark:bg-gray-800">
+              {group.slug}
+            </code>
           </p>
         </div>
         <Badge variant={group.isEnabled ? 'default' : 'outline'}>
@@ -234,7 +241,7 @@ export default function GroupDetailPage() {
         </CardHeader>
         <CardContent>
           {groupProviders.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <p className="text-gray-500">暂无提供商</p>
               <Button onClick={() => setAddDialogOpen(true)} variant="outline" className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
@@ -298,9 +305,9 @@ export default function GroupDetailPage() {
                           title={gp.isEnabled ? '在此分组中禁用' : '在此分组中启用'}
                         >
                           {gp.isEnabled ? (
-                            <PowerOff className="h-4 w-4 mr-1" />
+                            <PowerOff className="mr-1 h-4 w-4" />
                           ) : (
-                            <Power className="h-4 w-4 mr-1" />
+                            <Power className="mr-1 h-4 w-4" />
                           )}
                           {gp.isEnabled ? '禁用' : '启用'}
                         </Button>
@@ -310,7 +317,7 @@ export default function GroupDetailPage() {
                           onClick={() => handleRemoveProvider(gp.providerId)}
                           title="从分组移除"
                         >
-                          <Trash2 className="h-4 w-4 mr-1" />
+                          <Trash2 className="mr-1 h-4 w-4" />
                           移除
                         </Button>
                       </div>
@@ -328,6 +335,17 @@ export default function GroupDetailPage() {
         onClose={handleAddDialogClose}
         groupId={groupId}
         existingProviderIds={groupProviders.map((gp) => gp.providerId)}
+      />
+
+      <ConfirmDialog
+        open={removeConfirmOpen}
+        onOpenChange={setRemoveConfirmOpen}
+        onConfirm={confirmRemoveProvider}
+        title="移除提供商"
+        description="确定要从此分组移除该提供商吗？"
+        confirmText="移除"
+        cancelText="取消"
+        variant="destructive"
       />
     </div>
   )

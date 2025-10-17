@@ -57,3 +57,6 @@ drizzle/migrations/
 *.sqlite
 *.sqlite3
 *.db
+
+# Serena
+.serena

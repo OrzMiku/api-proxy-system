@@ -12,9 +12,10 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Plus, Pencil, Trash2, PowerOff, Power, Copy, Check } from 'lucide-react'
+import { Plus, Pencil, Trash2, PowerOff, Power, Lock } from 'lucide-react'
 import { toast } from 'sonner'
 import { ApiKeyDialog } from '@/components/api-keys/api-key-dialog'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 
 type ApiKey = {
   id: number
@@ -35,7 +36,8 @@ export default function ApiKeysPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingKey, setEditingKey] = useState<ApiKey | null>(null)
-  const [copiedId, setCopiedId] = useState<number | null>(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deletingKeyId, setDeletingKeyId] = useState<number | null>(null)
 
   const fetchApiKeys = async () => {
     try {
@@ -69,11 +71,16 @@ export default function ApiKeysPage() {
     }
   }
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定要删除这个 API Key 吗？此操作无法撤销。')) return
+  const handleDelete = (id: number) => {
+    setDeletingKeyId(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!deletingKeyId) return
 
     try {
-      const response = await fetch(`/api/admin/api-keys/${id}`, {
+      const response = await fetch(`/api/admin/api-keys/${deletingKeyId}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete API key')
@@ -82,23 +89,14 @@ export default function ApiKeysPage() {
     } catch (error) {
       toast.error('删除失败')
       console.error(error)
+    } finally {
+      setDeletingKeyId(null)
     }
   }
 
   const handleEdit = (apiKey: ApiKey) => {
     setEditingKey(apiKey)
     setDialogOpen(true)
-  }
-
-  const handleCopy = async (key: string, id: number) => {
-    try {
-      await navigator.clipboard.writeText(key)
-      setCopiedId(id)
-      toast.success('已复制到剪贴板')
-      setTimeout(() => setCopiedId(null), 2000)
-    } catch (error) {
-      toast.error('复制失败')
-    }
   }
 
   const handleDialogClose = (success?: boolean) => {
@@ -127,7 +125,7 @@ export default function ApiKeysPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <p className="text-gray-500">加载中...</p>
       </div>
     )
@@ -153,7 +151,7 @@ export default function ApiKeysPage() {
         </CardHeader>
         <CardContent>
           {apiKeys.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <p className="text-gray-500">暂无 API Key</p>
               <Button onClick={() => setDialogOpen(true)} variant="outline" className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
@@ -185,20 +183,13 @@ export default function ApiKeysPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <code className="text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded font-mono">
+                        <code className="rounded bg-gray-100 px-2 py-1 font-mono text-sm dark:bg-gray-800">
                           {key.key}
                         </code>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleCopy(key.key, key.id)}
-                        >
-                          {copiedId === key.id ? (
-                            <Check className="h-3 w-3" />
-                          ) : (
-                            <Copy className="h-3 w-3" />
-                          )}
-                        </Button>
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <Lock className="h-3 w-3" />
+                          <span>已加密</span>
+                        </div>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -219,15 +210,9 @@ export default function ApiKeysPage() {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant={
-                          !key.isEnabled || isExpired(key.expiresAt) ? 'outline' : 'default'
-                        }
+                        variant={!key.isEnabled || isExpired(key.expiresAt) ? 'outline' : 'default'}
                       >
-                        {!key.isEnabled
-                          ? '禁用'
-                          : isExpired(key.expiresAt)
-                            ? '已过期'
-                            : '启用'}
+                        {!key.isEnabled ? '禁用' : isExpired(key.expiresAt) ? '已过期' : '启用'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -239,9 +224,9 @@ export default function ApiKeysPage() {
                           title={key.isEnabled ? '禁用' : '启用'}
                         >
                           {key.isEnabled ? (
-                            <PowerOff className="h-4 w-4 mr-1" />
+                            <PowerOff className="mr-1 h-4 w-4" />
                           ) : (
-                            <Power className="h-4 w-4 mr-1" />
+                            <Power className="mr-1 h-4 w-4" />
                           )}
                           {key.isEnabled ? '禁用' : '启用'}
                         </Button>
@@ -251,7 +236,7 @@ export default function ApiKeysPage() {
                           onClick={() => handleEdit(key)}
                           title="编辑"
                         >
-                          <Pencil className="h-4 w-4 mr-1" />
+                          <Pencil className="mr-1 h-4 w-4" />
                           编辑
                         </Button>
                         <Button
@@ -260,7 +245,7 @@ export default function ApiKeysPage() {
                           onClick={() => handleDelete(key.id)}
                           title="删除"
                         >
-                          <Trash2 className="h-4 w-4 mr-1" />
+                          <Trash2 className="mr-1 h-4 w-4" />
                           删除
                         </Button>
                       </div>
@@ -274,6 +259,17 @@ export default function ApiKeysPage() {
       </Card>
 
       <ApiKeyDialog open={dialogOpen} onClose={handleDialogClose} apiKey={editingKey} />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        onConfirm={confirmDelete}
+        title="删除 API Key"
+        description="确定要删除这个 API Key 吗？此操作无法撤销。"
+        confirmText="删除"
+        cancelText="取消"
+        variant="destructive"
+      />
     </div>
   )
 }

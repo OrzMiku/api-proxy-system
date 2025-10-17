@@ -65,6 +65,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // Return user object (without password hash)
           return {
             id: user.id.toString(),
+            username: user.username,
             name: user.name || user.username,
             email: user.email,
             role: user.role,
@@ -86,6 +87,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Add user info to token on sign in
       if (user) {
         token['id'] = user.id
+        token['username'] = user.username
         token['role'] = user.role
       }
       return token
@@ -94,6 +96,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Add user info to session
       if (token && session.user) {
         session.user.id = token['id'] as string
+        session.user.username = token['username'] as string
         session.user.role = token['role'] as string
       }
       return session
@@ -114,6 +117,7 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string
+      username: string
       name?: string | null
       email?: string | null
       role: string
@@ -122,11 +126,13 @@ declare module 'next-auth' {
 
   interface User {
     id: string
+    username: string
     role: string
   }
 
   interface JWT {
     id?: string
+    username?: string
     role?: string
   }
 }

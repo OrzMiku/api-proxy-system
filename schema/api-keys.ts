@@ -18,8 +18,12 @@ export const apiKeys = sqliteTable('api_keys', {
   rateLimit: integer('rate_limit').notNull().default(100), // Requests per minute
   expiresAt: integer('expires_at', { mode: 'timestamp' }), // null = never expires
   lastUsedAt: integer('last_used_at', { mode: 'timestamp' }),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull().default(sql`(unixepoch())`),
+  createdAt: integer('created_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
+  updatedAt: integer('updated_at', { mode: 'timestamp' })
+    .notNull()
+    .default(sql`(unixepoch())`),
 })
 
 export type ApiKey = typeof apiKeys.$inferSelect

@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge'
 import { Plus, Pencil, Trash2, Power, PowerOff } from 'lucide-react'
 import { toast } from 'sonner'
 import { ProviderDialog } from '@/components/providers/provider-dialog'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 
 type Provider = {
   id: number
@@ -33,6 +34,8 @@ export default function ProvidersPage() {
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingProvider, setEditingProvider] = useState<Provider | null>(null)
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+  const [deletingProviderId, setDeletingProviderId] = useState<number | null>(null)
 
   const fetchProviders = async () => {
     try {
@@ -66,11 +69,16 @@ export default function ProvidersPage() {
     }
   }
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('确定要删除这个提供商吗？此操作无法撤销。')) return
+  const handleDelete = (id: number) => {
+    setDeletingProviderId(id)
+    setDeleteConfirmOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (!deletingProviderId) return
 
     try {
-      const response = await fetch(`/api/admin/providers/${id}`, {
+      const response = await fetch(`/api/admin/providers/${deletingProviderId}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete provider')
@@ -79,6 +87,8 @@ export default function ProvidersPage() {
     } catch (error) {
       toast.error('删除失败')
       console.error(error)
+    } finally {
+      setDeletingProviderId(null)
     }
   }
 
@@ -97,7 +107,7 @@ export default function ProvidersPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <p className="text-gray-500">加载中...</p>
       </div>
     )
@@ -123,7 +133,7 @@ export default function ProvidersPage() {
         </CardHeader>
         <CardContent>
           {providers.length === 0 ? (
-            <div className="text-center py-12">
+            <div className="py-12 text-center">
               <p className="text-gray-500">暂无提供商</p>
               <Button onClick={() => setDialogOpen(true)} variant="outline" className="mt-4">
                 <Plus className="mr-2 h-4 w-4" />
@@ -163,9 +173,9 @@ export default function ProvidersPage() {
                           title={provider.isEnabled ? '禁用' : '启用'}
                         >
                           {provider.isEnabled ? (
-                            <PowerOff className="h-4 w-4 mr-1" />
+                            <PowerOff className="mr-1 h-4 w-4" />
                           ) : (
-                            <Power className="h-4 w-4 mr-1" />
+                            <Power className="mr-1 h-4 w-4" />
                           )}
                           {provider.isEnabled ? '禁用' : '启用'}
                         </Button>
@@ -175,7 +185,7 @@ export default function ProvidersPage() {
                           onClick={() => handleEdit(provider)}
                           title="编辑"
                         >
-                          <Pencil className="h-4 w-4 mr-1" />
+                          <Pencil className="mr-1 h-4 w-4" />
                           编辑
                         </Button>
                         <Button
@@ -184,7 +194,7 @@ export default function ProvidersPage() {
                           onClick={() => handleDelete(provider.id)}
                           title="删除"
                         >
-                          <Trash2 className="h-4 w-4 mr-1" />
+                          <Trash2 className="mr-1 h-4 w-4" />
                           删除
                         </Button>
                       </div>
@@ -197,10 +207,17 @@ export default function ProvidersPage() {
         </CardContent>
       </Card>
 
-      <ProviderDialog
-        open={dialogOpen}
-        onClose={handleDialogClose}
-        provider={editingProvider}
+      <ProviderDialog open={dialogOpen} onClose={handleDialogClose} provider={editingProvider} />
+
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        onConfirm={confirmDelete}
+        title="删除提供商"
+        description="确定要删除这个提供商吗？此操作无法撤销。"
+        confirmText="删除"
+        cancelText="取消"
+        variant="destructive"
       />
     </div>
   )

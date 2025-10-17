@@ -92,11 +92,7 @@ export function GroupForm({ defaultValues, onSubmit, submitLabel = '保存' }: G
             <FormItem>
               <FormLabel>描述 (可选)</FormLabel>
               <FormControl>
-                <Input
-                  placeholder="关于这个分组的说明"
-                  {...field}
-                  value={field.value || ''}
-                />
+                <Input placeholder="关于这个分组的说明" {...field} value={field.value || ''} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -117,6 +113,7 @@ export function GroupForm({ defaultValues, onSubmit, submitLabel = '保存' }: G
                 </FormControl>
                 <SelectContent>
                   <SelectItem value="weighted-round-robin">加权轮询</SelectItem>
+                  <SelectItem value="priority-failover">优先级故障转移</SelectItem>
                   <SelectItem value="least-connections">最少连接</SelectItem>
                   <SelectItem value="ip-hash">IP Hash</SelectItem>
                   <SelectItem value="random">随机</SelectItem>

@@ -47,7 +47,14 @@ export const groupSchema = z.object({
   description: z.string().optional(),
   isEnabled: z.boolean().optional().default(true),
   pollingStrategy: z
-    .enum(['weighted-round-robin', 'least-connections', 'ip-hash', 'random', 'round-robin'])
+    .enum([
+      'weighted-round-robin',
+      'priority-failover',
+      'least-connections',
+      'ip-hash',
+      'random',
+      'round-robin',
+    ])
     .optional()
     .default('weighted-round-robin'),
   metadata: z.string().optional(),

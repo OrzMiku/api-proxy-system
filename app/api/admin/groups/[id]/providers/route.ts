@@ -10,10 +10,7 @@ import { eq, and } from 'drizzle-orm'
  * GET /api/admin/groups/[id]/providers
  * Get all providers in a group
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await verifyAdminAuth()
     const { id } = await params
@@ -60,10 +57,7 @@ export async function GET(
  * POST /api/admin/groups/[id]/providers
  * Add a provider to a group
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await verifyAdminAuth()
     const { id } = await params
@@ -107,10 +101,7 @@ export async function POST(
       .limit(1)
 
     if (existing) {
-      return NextResponse.json(
-        { error: 'Provider already in group' },
-        { status: 409 }
-      )
+      return NextResponse.json({ error: 'Provider already in group' }, { status: 409 })
     }
 
     // Add provider to group
@@ -124,7 +115,10 @@ export async function POST(
       })
       .returning()
 
-    logger.info({ userId, groupId, providerId: validatedData.providerId }, 'Provider added to group')
+    logger.info(
+      { userId, groupId, providerId: validatedData.providerId },
+      'Provider added to group'
+    )
 
     return NextResponse.json({ groupProvider: newGroupProvider }, { status: 201 })
   } catch (error) {

@@ -67,23 +67,21 @@ async function handleProxyRequest(
     // Group-specific keys can only access their assigned group
     if (apiKey.groupId !== null) {
       // Look up the group to get its ID
-      const [group] = await db
-        .select()
-        .from(groups)
-        .where(eq(groups.slug, groupSlug))
-        .limit(1)
+      const [group] = await db.select().from(groups).where(eq(groups.slug, groupSlug)).limit(1)
 
       if (!group) {
         logger.warn({ groupSlug }, 'Group not found')
-        return NextResponse.json(
-          { error: 'Group not found' },
-          { status: 404 }
-        )
+        return NextResponse.json({ error: 'Group not found' }, { status: 404 })
       }
 
       if (apiKey.groupId !== group.id) {
         logger.warn(
-          { apiKeyId: apiKey.id, apiKeyGroupId: apiKey.groupId, requestedGroupId: group.id, groupSlug },
+          {
+            apiKeyId: apiKey.id,
+            apiKeyGroupId: apiKey.groupId,
+            requestedGroupId: group.id,
+            groupSlug,
+          },
           'Forbidden: API key does not have access to this group'
         )
 
@@ -100,10 +98,7 @@ async function handleProxyRequest(
     const rateLimitHeaders = createRateLimitHeaders(rateLimitResult)
 
     if (!rateLimitResult.allowed) {
-      logger.warn(
-        { apiKeyId: apiKey.id, limit: apiKey.rateLimit },
-        'Rate limit exceeded'
-      )
+      logger.warn({ apiKeyId: apiKey.id, limit: apiKey.rateLimit }, 'Rate limit exceeded')
 
       return NextResponse.json(
         {
@@ -159,6 +154,11 @@ async function handleProxyRequest(
     // Step 7: Prepare response with proxy metadata headers
     const responseHeaders = new Headers(response.headers)
 
+    // Remove content-encoding to prevent double compression
+    // Next.js may compress the response again, causing issues with clients
+    responseHeaders.delete('content-encoding')
+    responseHeaders.delete('content-length') // Will be recalculated
+
     // Add rate limit headers
     Object.entries(rateLimitHeaders).forEach(([key, value]) => {
       responseHeaders.set(key, value)
@@ -183,12 +183,14 @@ async function handleProxyRequest(
         status: response.status,
         responseTime,
         totalTime: Date.now() - startTime,
+        responseBodySize: responseBody.byteLength,
       },
       'Proxy request completed'
     )
 
     // Log request to database (non-blocking)
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    const clientIp =
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || undefined
 
     // Get group ID for logging
@@ -233,7 +235,8 @@ async function handleProxyRequest(
     const errorMessage = error instanceof Error ? error.message : 'Internal server error'
 
     // Try to log failed request (non-blocking)
-    const clientIp = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    const clientIp =
+      request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
     const userAgent = request.headers.get('user-agent') || undefined
 
     db.insert(requestLogs)

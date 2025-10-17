@@ -41,17 +41,15 @@ export type SelectedProvider = {
 
 /**
  * Get all enabled providers for a group with Redis caching
+ * Returns both the group info and its providers
  */
-export async function getGroupProviders(
-  groupSlug: string
-): Promise<GroupProvider[]> {
+export async function getGroupProviders(groupSlug: string): Promise<{
+  group: { id: number; slug: string; pollingStrategy: string }
+  providers: GroupProvider[]
+}> {
   try {
     // Find group by slug
-    const [group] = await db
-      .select()
-      .from(groups)
-      .where(eq(groups.slug, groupSlug))
-      .limit(1)
+    const [group] = await db.select().from(groups).where(eq(groups.slug, groupSlug)).limit(1)
 
     if (!group) {
       throw new Error(`Group not found: ${groupSlug}`)
@@ -67,7 +65,10 @@ export async function getGroupProviders(
 
     if (cached) {
       logger.debug({ groupId: group.id, groupSlug }, 'Group providers found in cache')
-      return JSON.parse(cached) as GroupProvider[]
+      return {
+        group: { id: group.id, slug: group.slug, pollingStrategy: group.pollingStrategy },
+        providers: JSON.parse(cached) as GroupProvider[],
+      }
     }
 
     // Not in cache, query database
@@ -112,18 +113,17 @@ export async function getGroupProviders(
     }
 
     // Cache in Redis
-    await redis.setex(
-      cacheKey,
-      RedisTTL.GROUP_ENDPOINTS,
-      JSON.stringify(groupProvidersData)
-    )
+    await redis.setex(cacheKey, RedisTTL.GROUP_ENDPOINTS, JSON.stringify(groupProvidersData))
 
     logger.info(
       { groupId: group.id, groupSlug, count: groupProvidersData.length },
       'Group providers loaded'
     )
 
-    return groupProvidersData
+    return {
+      group: { id: group.id, slug: group.slug, pollingStrategy: group.pollingStrategy },
+      providers: groupProvidersData,
+    }
   } catch (error) {
     logger.error({ err: error, groupSlug }, 'Failed to get group providers')
     throw error
@@ -218,8 +218,7 @@ export async function updateProviderHealth(
       : currentHealth.successRate * (1 - alpha)
 
     // Calculate new average response time (exponential moving average)
-    const newAvgResponseTime =
-      currentHealth.avgResponseTime * (1 - alpha) + responseTime * alpha
+    const newAvgResponseTime = currentHealth.avgResponseTime * (1 - alpha) + responseTime * alpha
 
     // Store in Redis with TTL
     await Promise.all([
@@ -242,10 +241,7 @@ export async function updateProviderHealth(
     )
 
     if (!healthy && error) {
-      logger.warn(
-        { providerId, consecutiveFailures, error },
-        'Provider marked as unhealthy'
-      )
+      logger.warn({ providerId, consecutiveFailures, error }, 'Provider marked as unhealthy')
     }
   } catch (err) {
     logger.error({ err, providerId }, 'Failed to update provider health')
@@ -261,9 +257,7 @@ export async function updateProviderHealth(
  * - Success rate bonus: 0-20 (based on percentage)
  * - Response time penalty: higher response time = higher penalty
  */
-export async function calculateProviderWeight(
-  provider: GroupProvider
-): Promise<number> {
+export async function calculateProviderWeight(provider: GroupProvider): Promise<number> {
   const health = await getProviderHealth(provider.id)
 
   // Start with base priority
@@ -304,15 +298,84 @@ export async function calculateProviderWeight(
 }
 
 /**
+ * Select a provider using priority-failover strategy
+ * Providers are sorted by priority (descending), and the highest priority healthy provider is selected.
+ * If the highest priority provider is unhealthy, fall back to the next one.
+ */
+export async function selectProviderWithPriorityFailover(
+  groupSlug: string,
+  providers: GroupProvider[]
+): Promise<SelectedProvider> {
+  try {
+    if (providers.length === 0) {
+      throw new Error(`No providers available for group: ${groupSlug}`)
+    }
+
+    // Sort providers by priority (descending)
+    const sortedProviders = [...providers].sort((a, b) => b.priority - a.priority)
+
+    // Try each provider in order of priority
+    for (const provider of sortedProviders) {
+      const health = await getProviderHealth(provider.id)
+
+      // Check if provider is healthy (less than 5 consecutive failures)
+      if (health.consecutiveFailures < 5) {
+        logger.info(
+          {
+            groupSlug,
+            providerId: provider.id,
+            providerName: provider.name,
+            priority: provider.priority,
+            consecutiveFailures: health.consecutiveFailures,
+          },
+          'Provider selected (priority-failover)'
+        )
+
+        return {
+          provider,
+          weight: provider.priority,
+        }
+      }
+
+      logger.debug(
+        {
+          groupSlug,
+          providerId: provider.id,
+          providerName: provider.name,
+          consecutiveFailures: health.consecutiveFailures,
+        },
+        'Provider skipped (unhealthy)'
+      )
+    }
+
+    // If all providers are unhealthy, use the highest priority one anyway
+    logger.warn({ groupSlug }, 'All providers unhealthy, using highest priority provider')
+
+    const highestPriority = sortedProviders[0]
+
+    if (!highestPriority) {
+      throw new Error(`No providers available for group: ${groupSlug}`)
+    }
+
+    return {
+      provider: highestPriority,
+      weight: highestPriority.priority,
+    }
+  } catch (error) {
+    logger.error({ err: error, groupSlug }, 'Failed to select provider (priority-failover)')
+    throw error
+  }
+}
+
+/**
  * Select a provider using weighted round-robin algorithm
  * Filters out unhealthy providers (5+ consecutive failures)
  */
-export async function selectProvider(
-  groupSlug: string
+export async function selectProviderWithWeightedRoundRobin(
+  groupSlug: string,
+  providers: GroupProvider[]
 ): Promise<SelectedProvider> {
   try {
-    const providers = await getGroupProviders(groupSlug)
-
     if (providers.length === 0) {
       throw new Error(`No providers available for group: ${groupSlug}`)
     }
@@ -332,9 +395,7 @@ export async function selectProvider(
     )
 
     // Filter out unhealthy providers (5+ consecutive failures)
-    const healthyProviders = weightedProviders.filter(
-      (p) => p.health.consecutiveFailures < 5
-    )
+    const healthyProviders = weightedProviders.filter((p) => p.health.consecutiveFailures < 5)
 
     if (healthyProviders.length === 0) {
       logger.warn({ groupSlug }, 'No healthy providers available, using all providers')
@@ -414,7 +475,7 @@ export async function selectProvider(
             weight: p.weight,
             totalWeight,
           },
-          'Provider selected'
+          'Provider selected (weighted-round-robin)'
         )
 
         return {
@@ -438,12 +499,34 @@ export async function selectProvider(
         providerName: last.provider.name,
         weight: last.weight,
       },
-      'Provider selected (fallback)'
+      'Provider selected (weighted-round-robin, fallback)'
     )
 
     return {
       provider: last.provider,
       weight: last.weight,
+    }
+  } catch (error) {
+    logger.error({ err: error, groupSlug }, 'Failed to select provider (weighted-round-robin)')
+    throw error
+  }
+}
+
+/**
+ * Select a provider based on group's polling strategy
+ */
+export async function selectProvider(groupSlug: string): Promise<SelectedProvider> {
+  try {
+    const { group, providers: groupProviders } = await getGroupProviders(groupSlug)
+
+    // Select based on polling strategy
+    switch (group.pollingStrategy) {
+      case 'priority-failover':
+        return await selectProviderWithPriorityFailover(groupSlug, groupProviders)
+
+      case 'weighted-round-robin':
+      default:
+        return await selectProviderWithWeightedRoundRobin(groupSlug, groupProviders)
     }
   } catch (error) {
     logger.error({ err: error, groupSlug }, 'Failed to select provider')
@@ -470,7 +553,19 @@ export async function forwardRequest(
 
   try {
     // Build target URL
-    const targetUrl = `${provider.baseUrl}${request.path}`
+    // Remove trailing slash from baseUrl to avoid double slashes
+    const baseUrl = provider.baseUrl.replace(/\/$/, '')
+    const targetUrl = `${baseUrl}${request.path}`
+
+    logger.debug(
+      {
+        providerId: provider.id,
+        baseUrl: provider.baseUrl,
+        requestPath: request.path,
+        targetUrl,
+      },
+      'Building target URL'
+    )
 
     // Prepare headers
     const headers = new Headers(request.headers)

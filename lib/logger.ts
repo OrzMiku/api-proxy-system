@@ -19,18 +19,9 @@ const logLevel = (process.env['LOG_LEVEL'] || 'info') as pino.Level
  */
 export const logger = pino({
   level: logLevel,
-  // Pretty print in development, JSON in production
-  transport:
-    process.env.NODE_ENV === 'development'
-      ? {
-          target: 'pino-pretty',
-          options: {
-            colorize: true,
-            translateTime: 'SYS:standard',
-            ignore: 'pid,hostname',
-          },
-        }
-      : undefined,
+  // Disable pino-pretty transport to avoid worker thread issues
+  // Use JSON logging in all environments for stability
+  transport: undefined,
   // Base fields included in every log
   base: {
     env: process.env['NODE_ENV'] || 'development',

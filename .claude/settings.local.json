@@ -10,7 +10,11 @@
       "Bash(cat:*)",
       "Bash(grep:*)",
       "Bash(touch:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "mcp__serena__search_for_pattern",
+      "mcp__serena__list_dir",
+      "Bash(npx shadcn@latest add alert-dialog:*)",
+      "mcp__serena__find_symbol"
     ],
     "deny": [],
     "ask": []

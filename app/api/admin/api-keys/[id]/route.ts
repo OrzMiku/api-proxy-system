@@ -11,10 +11,7 @@ import { eq } from 'drizzle-orm'
  * GET /api/admin/api-keys/[id]
  * Get a specific API key by ID (with masked key)
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await verifyAdminAuth()
     const { id } = await params
@@ -43,10 +40,7 @@ export async function GET(
  * PUT /api/admin/api-keys/[id]
  * Update an API key (cannot update the key itself)
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const userId = await verifyAdminAuth()
     const { id } = await params

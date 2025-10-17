@@ -19,11 +19,7 @@ async function seed() {
 
   // 1. Create or get test user
   console.log('1️⃣ Creating test user...')
-  const [existingUser] = await db
-    .select()
-    .from(users)
-    .where(eq(users.username, 'admin'))
-    .limit(1)
+  const [existingUser] = await db.select().from(users).where(eq(users.username, 'admin')).limit(1)
 
   let userId: number
 

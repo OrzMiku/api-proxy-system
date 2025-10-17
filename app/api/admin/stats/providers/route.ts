@@ -56,9 +56,6 @@ export async function GET(_request: NextRequest) {
     return NextResponse.json({ providers: providerStats })
   } catch (error) {
     console.error('Failed to get provider stats:', error)
-    return NextResponse.json(
-      { error: 'Failed to get provider statistics' },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Failed to get provider statistics' }, { status: 500 })
   }
 }
